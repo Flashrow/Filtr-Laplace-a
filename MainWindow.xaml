@@ -1,0 +1,51 @@
+﻿<Window x:Class="FiltrLaplace.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:FiltrLaplace"
+        mc:Ignorable="d"
+        Title="Filtr Laplace'a" Height="450" Width="800">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="1*" />
+            <ColumnDefinition Width="2*" />
+        </Grid.ColumnDefinitions>
+
+        <Grid Grid.Column="0" Background="#FFC1C1C1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="1*" />
+                <RowDefinition Height="1*" />
+                <RowDefinition Height="1*" />
+            </Grid.RowDefinitions>
+            <Button x:Name="BtnAdd" Grid.Row="0" Margin="40">Wybierz zdjęcie</Button>
+
+            <Grid Grid.Row="1">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="1*" />
+                    <RowDefinition Height="1*" />
+                    <RowDefinition Height="1*" />
+                </Grid.RowDefinitions>
+                <Label Grid.Row="0" HorizontalAlignment="Center" Margin="10">Wybierz język</Label>
+                <Grid Grid.Row="1">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="1*" />
+                        <ColumnDefinition Width="1*" />
+                    </Grid.ColumnDefinitions>
+                    <RadioButton Grid.Column="0" HorizontalAlignment="Right" Margin="5">Assembler</RadioButton>
+                    <RadioButton Grid.Column="1" HorizontalAlignment="Left" Margin="5">C++</RadioButton>
+
+                </Grid>
+            </Grid>
+            <Grid Grid.Row="2">
+                <Button Grid.Row="0" Margin="40">Filtruj</Button>
+            </Grid>
+        </Grid>
+
+        <Grid Grid.Column="1">
+            <Grid.Background>
+                <ImageBrush x:Name="ImageBackground" ImageSource="G:\Grafika\student\piwo\kustoszt.png"/>
+            </Grid.Background>
+        </Grid>
+    </Grid>
+</Window>

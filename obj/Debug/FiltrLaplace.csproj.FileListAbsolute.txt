@@ -1,0 +1,15 @@
+G:\Dokumenty\Uczelnia\JA\_projekt\repo\FiltrLaplace\bin\Debug\FiltrLaplace.exe.config
+G:\Dokumenty\Uczelnia\JA\_projekt\repo\FiltrLaplace\bin\Debug\FiltrLaplace.exe
+G:\Dokumenty\Uczelnia\JA\_projekt\repo\FiltrLaplace\bin\Debug\FiltrLaplace.pdb
+G:\Dokumenty\Uczelnia\JA\_projekt\repo\FiltrLaplace\obj\Debug\FiltrLaplace.csprojAssemblyReference.cache
+G:\Dokumenty\Uczelnia\JA\_projekt\repo\FiltrLaplace\obj\Debug\MainWindow.g.cs
+G:\Dokumenty\Uczelnia\JA\_projekt\repo\FiltrLaplace\obj\Debug\App.g.cs
+G:\Dokumenty\Uczelnia\JA\_projekt\repo\FiltrLaplace\obj\Debug\FiltrLaplace_MarkupCompile.cache
+G:\Dokumenty\Uczelnia\JA\_projekt\repo\FiltrLaplace\obj\Debug\FiltrLaplace_MarkupCompile.lref
+G:\Dokumenty\Uczelnia\JA\_projekt\repo\FiltrLaplace\obj\Debug\MainWindow.baml
+G:\Dokumenty\Uczelnia\JA\_projekt\repo\FiltrLaplace\obj\Debug\FiltrLaplace.g.resources
+G:\Dokumenty\Uczelnia\JA\_projekt\repo\FiltrLaplace\obj\Debug\FiltrLaplace.Properties.Resources.resources
+G:\Dokumenty\Uczelnia\JA\_projekt\repo\FiltrLaplace\obj\Debug\FiltrLaplace.csproj.GenerateResource.cache
+G:\Dokumenty\Uczelnia\JA\_projekt\repo\FiltrLaplace\obj\Debug\FiltrLaplace.csproj.CoreCompileInputs.cache
+G:\Dokumenty\Uczelnia\JA\_projekt\repo\FiltrLaplace\obj\Debug\FiltrLaplace.exe
+G:\Dokumenty\Uczelnia\JA\_projekt\repo\FiltrLaplace\obj\Debug\FiltrLaplace.pdb
