@@ -18,7 +18,7 @@
                 <RowDefinition Height="1*" />
                 <RowDefinition Height="1*" />
             </Grid.RowDefinitions>
-            <Button x:Name="BtnAdd" Grid.Row="0" Margin="40">Wybierz zdjęcie</Button>
+            <Button x:Name="BtnAddImage" Grid.Row="0" Margin="40" Click="btn_AddImage">Wybierz zdjęcie</Button>
 
             <Grid Grid.Row="1">
                 <Grid.RowDefinitions>
@@ -38,13 +38,13 @@
                 </Grid>
             </Grid>
             <Grid Grid.Row="2">
-                <Button Grid.Row="0" Margin="40">Filtruj</Button>
+                <Button Grid.Row="0" Margin="40" Click="btn_FilterImage">Filtruj</Button>
             </Grid>
         </Grid>
 
         <Grid Grid.Column="1">
             <Grid.Background>
-                <ImageBrush x:Name="ImageBackground" ImageSource="G:\Grafika\student\piwo\kustoszt.png"/>
+                <ImageBrush x:Name="ImageEdit"/>
             </Grid.Background>
         </Grid>
     </Grid>
