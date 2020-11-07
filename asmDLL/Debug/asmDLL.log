@@ -1,0 +1,7 @@
+﻿  Assembling SourceAsm.asm...
+SourceAsm.asm(1): error A2013: .MODEL must precede this directive
+SourceAsm.asm(2): error A2034: must be in segment block : laplaceFilter
+SourceAsm.asm(3): error A2034: must be in segment block
+SourceAsm.asm(4): error A2034: must be in segment block
+SourceAsm.asm(5): fatal error A1010: unmatched block nesting : laplaceFilter
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\MSBuild\Microsoft\VC\v160\BuildCustomizations\masm.targets(70,5): error MSB3721: The command "ml.exe /c /nologo /Zi /Fo"Debug\SourceAsm.obj" /W3 /errorReport:prompt  /TaSourceAsm.asm" exited with code 1.
