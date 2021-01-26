@@ -4,15 +4,16 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:FiltrLaplace"
+        xmlns:lvc="clr-namespace:LiveCharts.Wpf;assembly=LiveCharts.Wpf"
         mc:Ignorable="d"
-        Title="Filtr Laplace'a" Height="450" Width="800">
+        Title="Filtr Laplace'a" Height="450" Width="1152.5">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="1*" />
             <ColumnDefinition Width="2*" />
         </Grid.ColumnDefinitions>
 
-        <Grid Grid.Column="0" Background="#FFC1C1C1">
+        <Grid Grid.Column="0" Background="#FFC1C1C1" Margin="0,0,174,0">
             <Grid.RowDefinitions>
                 <RowDefinition Height="1*" />
                 <RowDefinition Height="1*" />
@@ -42,10 +43,18 @@
             </Grid>
         </Grid>
 
-        <Grid Grid.Column="1">
+        <Grid Margin="212,0,528,0" Grid.ColumnSpan="2">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="369*"/>
+                <RowDefinition Height="50*"/>
+            </Grid.RowDefinitions>
             <Grid.Background>
                 <ImageBrush x:Name="ImageEdit"/>
             </Grid.Background>
+        </Grid>
+
+        <Grid Grid.Column="1" HorizontalAlignment="Right" Width="523">
+            <lvc:CartesianChart Margin="-51,0,0,0" Height="419" VerticalAlignment="Top" Content="" HorizontalAlignment="Right" Width="501"/>
         </Grid>
     </Grid>
 </Window>

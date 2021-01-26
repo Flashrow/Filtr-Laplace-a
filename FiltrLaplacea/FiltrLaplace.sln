@@ -10,6 +10,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FiltrLaplace", "FiltrLaplac
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "asmDLL", "..\asmDLL\asmDLL.vcxproj", "{7E7B8F99-D20A-4213-AC52-9155C18CC384}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AsmDebug", "..\AsmDebug\AsmDebug.vcxproj", "{D0124528-C3DE-41BF-8755-17A4BEA90C8F}"
+	ProjectSection(ProjectDependencies) = postProject
+		{7E7B8F99-D20A-4213-AC52-9155C18CC384} = {7E7B8F99-D20A-4213-AC52-9155C18CC384}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -42,6 +47,16 @@ Global
 		{7E7B8F99-D20A-4213-AC52-9155C18CC384}.Release|x64.Build.0 = Release|x64
 		{7E7B8F99-D20A-4213-AC52-9155C18CC384}.Release|x86.ActiveCfg = Release|Win32
 		{7E7B8F99-D20A-4213-AC52-9155C18CC384}.Release|x86.Build.0 = Release|Win32
+		{D0124528-C3DE-41BF-8755-17A4BEA90C8F}.Debug|Any CPU.ActiveCfg = Debug|Win32
+		{D0124528-C3DE-41BF-8755-17A4BEA90C8F}.Debug|x64.ActiveCfg = Debug|x64
+		{D0124528-C3DE-41BF-8755-17A4BEA90C8F}.Debug|x64.Build.0 = Debug|x64
+		{D0124528-C3DE-41BF-8755-17A4BEA90C8F}.Debug|x86.ActiveCfg = Debug|Win32
+		{D0124528-C3DE-41BF-8755-17A4BEA90C8F}.Debug|x86.Build.0 = Debug|Win32
+		{D0124528-C3DE-41BF-8755-17A4BEA90C8F}.Release|Any CPU.ActiveCfg = Release|Win32
+		{D0124528-C3DE-41BF-8755-17A4BEA90C8F}.Release|x64.ActiveCfg = Release|x64
+		{D0124528-C3DE-41BF-8755-17A4BEA90C8F}.Release|x64.Build.0 = Release|x64
+		{D0124528-C3DE-41BF-8755-17A4BEA90C8F}.Release|x86.ActiveCfg = Release|Win32
+		{D0124528-C3DE-41BF-8755-17A4BEA90C8F}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

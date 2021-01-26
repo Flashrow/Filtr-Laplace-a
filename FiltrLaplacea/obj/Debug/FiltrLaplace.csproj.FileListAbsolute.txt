@@ -43,3 +43,10 @@ G:\Dokumenty\Uczelnia\JA\projekt\repo\FiltrLaplacea\obj\Debug\FiltrLaplace.cspro
 G:\Dokumenty\Uczelnia\JA\projekt\repo\FiltrLaplacea\obj\Debug\FiltrLaplace.csproj.CoreCompileInputs.cache
 G:\Dokumenty\Uczelnia\JA\projekt\repo\FiltrLaplacea\obj\Debug\FiltrLaplace.exe
 G:\Dokumenty\Uczelnia\JA\projekt\repo\FiltrLaplacea\obj\Debug\FiltrLaplace.pdb
+G:\Dokumenty\Uczelnia\JA\projekt\repo\FiltrLaplacea\bin\Debug\LiveCharts.dll
+G:\Dokumenty\Uczelnia\JA\projekt\repo\FiltrLaplacea\bin\Debug\LiveCharts.Wpf.dll
+G:\Dokumenty\Uczelnia\JA\projekt\repo\FiltrLaplacea\bin\Debug\LiveCharts.pdb
+G:\Dokumenty\Uczelnia\JA\projekt\repo\FiltrLaplacea\bin\Debug\LiveCharts.xml
+G:\Dokumenty\Uczelnia\JA\projekt\repo\FiltrLaplacea\bin\Debug\LiveCharts.Wpf.pdb
+G:\Dokumenty\Uczelnia\JA\projekt\repo\FiltrLaplacea\bin\Debug\LiveCharts.Wpf.xml
+G:\Dokumenty\Uczelnia\JA\projekt\repo\FiltrLaplacea\obj\Debug\FiltrLaplace.csproj.CopyComplete
