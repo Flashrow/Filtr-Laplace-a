@@ -6,15 +6,23 @@
 
 
 typedef unsigned char byte;
-typedef void (*CONVERT_TO_RPN)(byte[], int, int, int);
+typedef int (*CONVERT_TO_RPN)(byte[], int, int, byte[]);
 int main()
 {
-    byte a[27] = { 255,255,255,0,0,0,255,255,255,0,0,0,255,255,255,0,0,0,255,255,255,0,0,0,255,255,255 };
+    
+    byte a[27] = { 255,255,255,0,0,0,255,255,255,5,5,5,255,255,255,5,5,5,255,255,255,5,5,0,60,80,90 };
+    byte b[27] = {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1};
+    std::cout << "a address:" << &a;
+    std::cout << "b address:" << &b;
     CONVERT_TO_RPN convertToRpnProc;
     HINSTANCE hDll = NULL;
     hDll = LoadLibrary(TEXT("AsmDLL"));
     convertToRpnProc = (CONVERT_TO_RPN)GetProcAddress(hDll, "laplaceFilter");
-    (convertToRpnProc)(a, 3, 3 , 27);
+    (convertToRpnProc)(a, 3, 3, b);
+    for (int i = 0; i < 27; i++) {
+        std::cout << "b[" << i << "] = " << b[i]*1 << std::endl;
+    }
+
     std::cout << "Hello World!\n";
 }
 

@@ -40,7 +40,7 @@ namespace FiltrLaplace
 		[DllImport("kernel32.dll", CharSet = CharSet.Ansi)]
 		private static extern IntPtr GetProcAddress(IntPtr hModule, string lpProcName);
 
-		delegate int laplaceFilter_Delegate();
+		delegate int laplaceFilter_Delegate(byte[] image, int width, int height, byte[] filteredImage);
 
 		[DllImport("gdi32.dll", EntryPoint = "DeleteObject")]
 		[return: MarshalAs(UnmanagedType.Bool)]
@@ -54,7 +54,7 @@ namespace FiltrLaplace
 		{
 			byte[] a = new byte[] { 255, 255, 255, 0, 0, 0, 255, 255, 255, 0, 0, 0, 255, 255, 255, 0, 0, 0, 255, 255, 255, 0, 0, 0, 255, 255, 255 };
 			laplaceFilter = new LaplaceFilter();
-			Console.WriteLine("Print from assembler: " + runInAsm());
+			//Console.WriteLine("Print from assembler: " + runInAsm());
 			//Array.ForEach(LAPLACE_MASK, delegate (int i) { weightSum += i; });
 			InitializeComponent();
 		}
@@ -83,12 +83,18 @@ namespace FiltrLaplace
 			byte[] pixels = new byte[length];
 			System.Runtime.InteropServices.Marshal.Copy(ptr, pixels, 0, length);
 
+			/*
             byte[] newImage = laplaceFilter.filter(pixels,
                                             preparedImageBmp.Width,
                                             preparedImageBmp.Height,
                                             pixels.Length);
+			*/
 
-            System.Runtime.InteropServices.Marshal.Copy(newImage, 0, ptr, length);
+			byte[] newImage = new byte[pixels.Length];
+			runInAsm(pixels, preparedImageBmp.Width,preparedImageBmp.Height, newImage);
+
+
+			System.Runtime.InteropServices.Marshal.Copy(newImage, 0, ptr, length);
 			preparedImageBmp.UnlockBits(bmpData);
 			ImageEdit.ImageSource = ImageSourceFromBitmap(preparedImageBmp);
         }
@@ -104,7 +110,7 @@ namespace FiltrLaplace
 			finally { DeleteObject(handle); }
 		}
 		
-		int runInAsm()
+		int runInAsm(byte[] image, int width, int height, byte[] filteredImage)
 		{
 			IntPtr Handle = LoadLibrary(@"G:\Dokumenty\Uczelnia\JA\projekt\repo\FiltrLaplacea\x64\Debug\asmDLL.dll");
             if (Handle == IntPtr.Zero)
@@ -113,7 +119,7 @@ namespace FiltrLaplace
             }
             IntPtr funcaddr = GetProcAddress(Handle, "laplaceFilter");
 			laplaceFilter_Delegate function = Marshal.GetDelegateForFunctionPointer(funcaddr, typeof(laplaceFilter_Delegate)) as laplaceFilter_Delegate;
-			return function.Invoke();
+			return function.Invoke(image, width, height, filteredImage);
 		}
 
 	}

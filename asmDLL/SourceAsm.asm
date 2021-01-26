@@ -1,46 +1,54 @@
 .data
-	image dd ?
-	newImage dd ?
+	image DQ ?
+	newImage DQ ?
 	LAPLACE_MASK dd 1, 1, 1, 1, -8, 1, 1, 1, 1
 	musk_dividor dd 1
-	iter_x dd 0
-	x_max dd 0
-	iter_y dd 0
-	y_max dd 0
-	image_width dd 0
-	height dd 0
-	sumR dd 0
-	sumG dd 0
-	sumB dd 0
+	iter_x DQ 0
+	x_max DQ 0
+	iter_y DQ 0
+	y_max DQ 0
+	image_width DQ 0
+	height DQ 0
+	sumR DQ 0
+	sumG DQ 0
+	sumB DQ 0
 
 
 .code
 laplaceFilter proc EXPORT
 
-	;push RBP        ; zapisuje adresy rejestrow RBP,RDI,RSP, aby po wykonaniu procedury, zachowac spojnosc w pamieci
+	push RBP        ; zapisuje adresy rejestrow RBP,RDI,RSP, aby po wykonaniu procedury, zachowac spojnosc w pamieci
     push RDI                
     push RSP
 
+	xor rax, rax
 
 	;zapisanie wskaznikow na tablice w rejestrach
-	mov eax, [rbp+8]
-	mov [image], eax
+	
+	mov rax, rcx
+	mov image, rax
+	;mov rcx, QWORD PTR [rax]
 
 	;zapisanie width i height w zmiennych
-	mov eax, [rbp+12]
-	mov [image_width], eax
-	mov eax, [rbp+16]
-	mov [height], eax
+	mov rax, rdx
+	mov [image_width], rax
+	mov rax, r8
+	mov [height], rax
+
+	mov newImage, r9
+	;mov rcx, [newImage]
+
+	
 
 	;ustawienie iter_x_max i iter_y_max
-	mov eax, [image_width]
-	sub eax, 2
-	mov ebx, 3
-	mul ebx
-	mov [x_max], eax
-	mov eax, [height]
-	sub eax, 2
-	mov [y_max], eax
+	mov rax, [image_width]
+	sub rax, 2
+	mov rbx, 3
+	mul rbx
+	mov [x_max], rax
+	mov rax, [height]
+	sub rax, 2
+	mov [y_max], rax
 
 	;iteracja przez tablice
 PETLAY:
@@ -52,450 +60,473 @@ PETLAY:
 PETLAX:
 	add iter_x, 3
 
-	xor eax, eax
+	xor rax, rax
 
-	mov sumR, eax;
-	mov sumG, eax;
-	mov sumB, eax;
+	mov sumR, rax;
+	mov sumG, rax;
+	mov sumB, rax;
 
 
 ; #################### TOP LEFT ############################
 	; top left pixel RED
-	mov eax, [iter_y]		
-	dec eax
+	mov rax, [iter_y]		
+	dec rax
 	mul [x_max]
-	add eax, [iter_x]
-	sub eax, 3				; move one pixel left
-	add eax, 0				; go to RED value
-	add eax, [image]
-	mov ebx, eax			; saving pixel position to ebx
-	mov eax, [ebx]			; value from [position]		
+	add rax, [iter_x]
+	sub rax, 3				; move one pixel left
+	add rax, 0				; go to RED value
+	add rax, image
+	xor rbx, rbx
+	mov rbx, [rax]			; value from [position]		; saving pixel position to rbx
 	mul [LAPLACE_MASK + 0]
-	add sumR, eax
+	add sumR, rbx
+	mov rax, sumR
 
 	; top left pixel GREEN
-	mov eax, [iter_y]		
-	dec eax
+	mov rax, [iter_y]		
+	dec rax
 	mul [x_max]
-	add eax, [iter_x]
-	sub eax, 3				; move one pixel left
-	add eax, 1				; go to GREEN value
-	add eax, [image]
-	mov ebx, eax
-	mov eax, [ebx]
+	add rax, [iter_x]
+	sub rax, 3				; move one pixel left
+	add rax, 1				; go to GREEN value
+	add rax, image
+	mov rbx, rax
+	mov rax, [rbx]
 	mul [LAPLACE_MASK + 0]
-	add sumG, eax
+	add sumG, rax
 
 	; top left pixel BLUE
-	mov eax, [iter_y]		
-	dec eax
+	mov rax, [iter_y]		
+	dec rax
 	mul [x_max]
-	add eax, [iter_x]
-	sub eax, 3				; move one pixel left
-	add eax, 2				; go to BLUE value
-	add eax, [image]
-	mov ebx, eax
-	mov eax, [ebx]
+	add rax, [iter_x]
+	sub rax, 3				; move one pixel left
+	add rax, 2				; go to BLUE value
+	add rax, image
+	mov rbx, rax
+	mov rax, [rbx]
 	mul [LAPLACE_MASK + 0]
-	add sumG, eax
+	add sumG, rax
 
 
 ; #################### TOP MIDDLE ############################
 	; top mid pixel RED
-	mov eax, [iter_y]		
-	dec eax
+	mov rax, [iter_y]		
+	dec rax
 	mul [x_max]
-	add eax, [iter_x]
-	add eax, 0				; stay middle pixel
-	add eax, 0				; go to RED value
-	add eax, [image]
-	mov ebx, eax			; saving pixel position to ebx
-	mov eax, [ebx]			; value from [position]		
+	add rax, [iter_x]
+	add rax, 0				; stay middle pixel
+	add rax, 0				; go to RED value
+	add rax, image
+	mov rbx, rax			; saving pixel position to rbx
+	mov rax, [rbx]			; value from [position]		
 	mul [LAPLACE_MASK + 4]
-	add sumR, eax
+	add sumR, rax
 
 	; top mid pixel GREEN
-	mov eax, [iter_y]		
-	dec eax
+	mov rax, [iter_y]		
+	dec rax
 	mul [x_max]
-	add eax, [iter_x]
-	add eax, 0				; stay middle pixel
-	add eax, 1				; go to GREEN value
-	add eax, [image]
-	mov ebx, eax
-	mov eax, [ebx]
+	add rax, [iter_x]
+	add rax, 0				; stay middle pixel
+	add rax, 1				; go to GREEN value
+	add rax, image
+	mov rbx, rax
+	mov rax, [rbx]
 	mul [LAPLACE_MASK + 4]
-	add sumG, eax
+	add sumG, rax
 
 	; top mid pixel BLUE
-	mov eax, [iter_y]		
-	dec eax
+	mov rax, [iter_y]		
+	dec rax
 	mul [x_max]
-	add eax, [iter_x]
-	add eax, 0				; stay middle pixel
-	add eax, 2				; go to BLUE value
-	add eax, [image]
-	mov ebx, eax
-	mov eax, [ebx]
+	add rax, [iter_x]
+	add rax, 0				; stay middle pixel
+	add rax, 2				; go to BLUE value
+	add rax, image
+	mov rbx, rax
+	mov rax, [rbx]
 	mul [LAPLACE_MASK + 4]
-	add sumG, eax
+	add sumG, rax
 
 
 ; #################### TOP RIGHT ############################
 	; top right pixel RED
-	mov eax, [iter_y]		
-	dec eax
+	mov rax, [iter_y]		
+	dec rax
 	mul [x_max]
-	add eax, [iter_x]
-	add eax, 3				; go one pixel right
-	add eax, 0				; go to RED value
-	add eax, [image]
-	mov ebx, eax			; saving pixel position to ebx
-	mov eax, [ebx]			; value from [position]		
+	add rax, [iter_x]
+	add rax, 3				; go one pixel right
+	add rax, 0				; go to RED value
+	add rax, image
+	mov rbx, rax			; saving pixel position to rbx
+	mov rax, [rbx]			; value from [position]		
 	mul [LAPLACE_MASK + 8]
-	add sumR, eax
+	add sumR, rax
 
 	; top right pixel GREEN
-	mov eax, [iter_y]		
-	dec eax
+	mov rax, [iter_y]		
+	dec rax
 	mul [x_max]
-	add eax, [iter_x]
-	add eax, 3				; go one pixel right
-	add eax, 1				; go to GREEN value
-	add eax, [image]
-	mov ebx, eax
-	mov eax, [ebx]
+	add rax, [iter_x]
+	add rax, 3				; go one pixel right
+	add rax, 1				; go to GREEN value
+	add rax, image
+	mov rbx, rax
+	mov rax, [rbx]
 	mul [LAPLACE_MASK + 8]
-	add sumG, eax
+	add sumG, rax
 
 	; top right pixel BLUE
-	mov eax, [iter_y]		
-	dec eax
+	mov rax, [iter_y]		
+	dec rax
 	mul [x_max]
-	add eax, [iter_x]
-	add eax, 3				; go one pixel right
-	add eax, 2				; go to BLUE value
-	add eax, [image]
-	mov ebx, eax
-	mov eax, [ebx]
+	add rax, [iter_x]
+	add rax, 3				; go one pixel right
+	add rax, 2				; go to BLUE value
+	add rax, image
+	mov rbx, rax
+	mov rax, [rbx]
 	mul [LAPLACE_MASK + 8]
-	add sumG, eax
+	add sumG, rax
 
 
 ; #################### MIDDLE LEFT ############################
 	; middle left pixel RED
-	mov eax, [iter_y]		
+	mov rax, [iter_y]		
 	mul [x_max]
-	add eax, [iter_x]
-	sub eax, 3				; go one pixel left
-	add eax, 0				; go to RED value
-	add eax, [image]
-	mov ebx, eax			; saving pixel position to ebx
-	mov eax, [ebx]			; value from [position]		
+	add rax, [iter_x]
+	sub rax, 3				; go one pixel left
+	add rax, 0				; go to RED value
+	add rax, image
+	mov rbx, rax			; saving pixel position to rbx
+	mov rax, [rbx]			; value from [position]		
 	mul [LAPLACE_MASK + 12]
-	add sumR, eax
+	add sumR, rax
 
 	; middle left pixel GREEN
-	mov eax, [iter_y]	
+	mov rax, [iter_y]	
 	mul [x_max]
-	add eax, [iter_x]
-	sub eax, 3				; go one pixel left
-	add eax, 1				; go to GREEN value
-	add eax, [image]
-	mov ebx, eax
-	mov eax, [ebx]
+	add rax, [iter_x]
+	sub rax, 3				; go one pixel left
+	add rax, 1				; go to GREEN value
+	add rax, image
+	mov rbx, rax
+	mov rax, [rbx]
 	mul [LAPLACE_MASK + 12]
-	add sumG, eax
+	add sumG, rax
 
 	; middle left pixel BLUE
-	mov eax, [iter_y]	
+	mov rax, [iter_y]	
 	mul [x_max]
-	add eax, [iter_x]
-	sub eax, 3				; go one pixel left
-	add eax, 2				; go to BLUE value
-	add eax, [image]
-	mov ebx, eax
-	mov eax, [ebx]
+	add rax, [iter_x]
+	sub rax, 3				; go one pixel left
+	add rax, 2				; go to BLUE value
+	add rax, image
+	mov rbx, rax
+	mov rax, [rbx]
 	mul [LAPLACE_MASK + 12]
-	add sumG, eax
+	add sumG, rax
 
 
 ; #################### MIDDLE MIDDLE ############################
 	; middle middle pixel RED
-	mov eax, [iter_y]		
+	mov rax, [iter_y]		
 	mul [x_max]
-	add eax, [iter_x]
-	sub eax, 0				; don't move pixel
-	add eax, 0				; go to RED value
-	add eax, [image]
-	mov ebx, eax			; saving pixel position to ebx
-	mov eax, [ebx]			; value from [position]		
+	add rax, [iter_x]
+	sub rax, 0				; don't move pixel
+	add rax, 0				; go to RED value
+	add rax, image
+	mov rbx, rax			; saving pixel position to rbx
+	mov rax, [rbx]			; value from [position]		
 	mul [LAPLACE_MASK + 16]
-	add sumR, eax
+	add sumR, rax
 
 	; middle middle pixel GREEN
-	mov eax, [iter_y]	
+	mov rax, [iter_y]	
 	mul [x_max]
-	add eax, [iter_x]
-	sub eax, 0				; don't move pixel
-	add eax, 1				; go to GREEN value
-	add eax, [image]
-	mov ebx, eax
-	mov eax, [ebx]
+	add rax, [iter_x]
+	sub rax, 0				; don't move pixel
+	add rax, 1				; go to GREEN value
+	add rax, image
+	mov rbx, rax
+	mov rax, [rbx]
 	mul [LAPLACE_MASK + 16]
-	add sumG, eax
+	add sumG, rax
 
 	; middle middle pixel BLUE
-	mov eax, [iter_y]	
+	mov rax, [iter_y]	
 	mul [x_max]
-	add eax, [iter_x]
-	sub eax, 0				; don't move pixel
-	add eax, 2				; go to BLUE value
-	add eax, [image]
-	mov ebx, eax
-	mov eax, [ebx]
+	add rax, [iter_x]
+	sub rax, 0				; don't move pixel
+	add rax, 2				; go to BLUE value
+	add rax, image
+	mov rbx, rax
+	mov rax, [rbx]
 	mul [LAPLACE_MASK + 16]
-	add sumG, eax
+	add sumG, rax
 
 
 ; #################### MIDDLE RIGHT ############################
 	; middle right pixel RED
-	mov eax, [iter_y]		
+	mov rax, [iter_y]		
 	mul [x_max]
-	add eax, [iter_x]
-	add eax, 3				; go one pixel right
-	add eax, 0				; go to RED value
-	add eax, [image]
-	mov ebx, eax			; saving pixel position to ebx
-	mov eax, [ebx]			; value from [position]		
+	add rax, [iter_x]
+	add rax, 3				; go one pixel right
+	add rax, 0				; go to RED value
+	add rax, image
+	mov rbx, rax			; saving pixel position to rbx
+	mov rax, [rbx]			; value from [position]		
 	mul [LAPLACE_MASK + 20]
-	add sumR, eax
+	add sumR, rax
 
 	; middle right pixel GREEN
-	mov eax, [iter_y]	
+	mov rax, [iter_y]	
 	mul [x_max]
-	add eax, [iter_x]
-	add eax, 3				; go one pixel right
-	add eax, 1				; go to GREEN value
-	add eax, [image]
-	mov ebx, eax
-	mov eax, [ebx]
+	add rax, [iter_x]
+	add rax, 3				; go one pixel right
+	add rax, 1				; go to GREEN value
+	add rax, image
+	mov rbx, rax
+	mov rax, [rbx]
 	mul [LAPLACE_MASK + 20]
-	add sumG, eax
+	add sumG, rax
 
 	; middle right pixel BLUE
-	mov eax, [iter_y]		
+	mov rax, [iter_y]		
 	mul [x_max]
-	add eax, [iter_x]
-	add eax, 3				; go one pixel right
-	add eax, 2				; go to BLUE value
-	add eax, [image]
-	mov ebx, eax
-	mov eax, [ebx]
+	add rax, [iter_x]
+	add rax, 3				; go one pixel right
+	add rax, 2				; go to BLUE value
+	add rax, image
+	mov rbx, rax
+	mov rax, [rbx]
 	mul [LAPLACE_MASK + 20]
-	add sumG, eax
+	add sumG, rax
 
 
 ; #################### BOTTOM LEFT ############################
 	; bottom left pixel RED
-	mov eax, [iter_y]	
-	inc eax				; go one pixel down
+	mov rax, [iter_y]	
+	inc rax				; go one pixel down
 	mul [x_max]
-	add eax, [iter_x]
-	sub eax, 3				; go one pixel left
-	add eax, 0				; go to RED value
-	add eax, [image]
-	mov ebx, eax			; saving pixel position to ebx
-	mov eax, [ebx]			; value from [position]		
+	add rax, [iter_x]
+	sub rax, 3				; go one pixel left
+	add rax, 0				; go to RED value
+	add rax, image
+	mov rbx, rax			; saving pixel position to rbx
+	mov rax, [rbx]			; value from [position]		
 	mul [LAPLACE_MASK + 24]																	
-	add sumR, eax																			
+	add sumR, rax																			
 																							
 	; bottom left pixel GREEN
-	mov eax, [iter_y]	
-	inc eax				; go one pixel down
+	mov rax, [iter_y]	
+	inc rax				; go one pixel down
 	mul [x_max]
-	add eax, [iter_x]
-	sub eax, 3				; go one pixel left
-	add eax, 1				; go to GREEN value
-	add eax, [image]
-	mov ebx, eax
-	mov eax, [ebx]
+	add rax, [iter_x]
+	sub rax, 3				; go one pixel left
+	add rax, 1				; go to GREEN value
+	add rax, image
+	mov rbx, rax
+	mov rax, [rbx]
 	mul [LAPLACE_MASK + 24]
-	add sumG, eax
+	add sumG, rax
 
 	; bottom left pixel BLUE
-	mov eax, [iter_y]		
-	inc eax				; go one pixel down
+	mov rax, [iter_y]		
+	inc rax				; go one pixel down
 	mul [x_max]
-	add eax, [iter_x]
-	sub eax, 3				; go one pixel left
-	add eax, 2				; go to BLUE value
-	add eax, [image]
-	mov ebx, eax
-	mov eax, [ebx]
+	add rax, [iter_x]
+	sub rax, 3				; go one pixel left
+	add rax, 2				; go to BLUE value
+	add rax, image
+	mov rbx, rax
+	mov rax, [rbx]
 	mul [LAPLACE_MASK + 24]
-	add sumG, eax
+	add sumG, rax
 
 
 ; #################### BOTTOM MIDDLE ############################
 	; bottom middle pixel RED
-	mov eax, [iter_y]	
-	inc eax				; go one pixel down
+	mov rax, [iter_y]	
+	inc rax				; go one pixel down
 	mul [x_max]
-	add eax, [iter_x]
-	sub eax, 0				; don't move pixel
-	add eax, 0				; go to RED value
-	add eax, [image]
-	mov ebx, eax			; saving pixel position to ebx
-	mov eax, [ebx]			; value from [position]		
+	add rax, [iter_x]
+	sub rax, 0				; don't move pixel
+	add rax, 0				; go to RED value
+	add rax, image
+	mov rbx, rax			; saving pixel position to rbx
+	mov rax, [rbx]			; value from [position]		
 	mul [LAPLACE_MASK + 28]
-	add sumR, eax
+	add sumR, rax
 
 	; bottom middle pixel GREEN
-	mov eax, [iter_y]	
-	inc eax				; go one pixel down
+	mov rax, [iter_y]	
+	inc rax				; go one pixel down
 	mul [x_max]
-	add eax, [iter_x]
-	sub eax, 0				; don't move pixel
-	add eax, 1				; go to GREEN value
-	add eax, [image]
-	mov ebx, eax
-	mov eax, [ebx]
+	add rax, [iter_x]
+	sub rax, 0				; don't move pixel
+	add rax, 1				; go to GREEN value
+	add rax, image
+	mov rbx, rax
+	mov rax, [rbx]
 	mul [LAPLACE_MASK + 28]
-	add sumG, eax
+	add sumG, rax
 
 	; bottom middle pixel BLUE
-	mov eax, [iter_y]		
-	inc eax				; go one pixel down
+	mov rax, [iter_y]		
+	inc rax				; go one pixel down
 	mul [x_max]
-	add eax, [iter_x]
-	sub eax, 0				; don't move pixel
-	add eax, 2				; go to BLUE value
-	add eax, [image]
-	mov ebx, eax
-	mov eax, [ebx]
+	add rax, [iter_x]
+	sub rax, 0				; don't move pixel
+	add rax, 2				; go to BLUE value
+	add rax, image
+	mov rbx, rax
+	mov rax, [rbx]
 	mul [LAPLACE_MASK + 28]
-	add sumG, eax
+	add sumG, rax
 
 
 ; #################### BOTTOM RIGHT ############################
 	; bottom right pixel RED
-	mov eax, [iter_y]	
-	inc eax				; go one pixel down
+	mov rax, [iter_y]	
+	inc rax				; go one pixel down
 	mul [x_max]
-	add eax, [iter_x]
-	add eax, 3				; go one pixel right
-	add eax, 0				; go to RED value
-	add eax, [image]
-	mov ebx, eax			; saving pixel position to ebx
-	mov eax, [ebx]			; value from [position]		
+	add rax, [iter_x]
+	add rax, 3				; go one pixel right
+	add rax, 0				; go to RED value
+	add rax, image
+	mov rbx, rax			; saving pixel position to rbx
+	mov rax, [rbx]			; value from [position]		
 	mul [LAPLACE_MASK + 32]
-	add sumR, eax
+	add sumR, rax
 
 	; bottom right pixel GREEN
-	mov eax, [iter_y]	
-	inc eax				; go one pixel down
+	mov rax, [iter_y]	
+	inc rax				; go one pixel down
 	mul [x_max]
-	add eax, [iter_x]
-	add eax, 3				; go one pixel right
-	add eax, 1				; go to GREEN value
-	add eax, [image]
-	mov ebx, eax
-	mov eax, [ebx]
+	add rax, [iter_x]
+	add rax, 3				; go one pixel right
+	add rax, 1				; go to GREEN value
+	add rax, image
+	mov rbx, rax
+	mov rax, [rbx]
 	mul [LAPLACE_MASK + 32]
-	add sumG, eax
+	add sumG, rax
 
 	; bottom right pixel BLUE
-	mov eax, [iter_y]	
-	inc eax				; go one pixel down
+	mov rax, [iter_y]	
+	inc rax				; go one pixel down
 	mul [x_max]
-	add eax, [iter_x]
-	add eax, 3				; go one pixel right
-	add eax, 2				; go to BLUE value
-	add eax, [image]
-	mov ebx, eax
-	mov eax, [ebx]
+	add rax, [iter_x]
+	add rax, 3				; go one pixel right
+	add rax, 2				; go to BLUE value
+	add rax, image
+	mov rbx, rax
+	mov rax, [rbx]
 	mul [LAPLACE_MASK + 32]
-	add sumG, eax
+	add sumG, rax
 
 
 	; normalizing sums
 	
-	mov eax, sumR
-	cmp eax, 255		;przycinanie wyniku
+	xor rax, rax
+	xor rbx, rbx
+	mov rax, sumR
+	cmp rax, 255		;przycinanie wyniku
 	JB LESS_R
-	mov eax, 255
+	mov rax, 255
+	mov sumR, rax
 	JMP GREEN
 LESS_R:
-	cmp eax, 0
+	cmp rax, 0
 	JA GREEN
-	mov ebx, 0
+	mov rax, 0
+	mov sumR, rax
 
 GREEN:
-	mov eax, sumG
-	cmp eax, 255		;przycinanie wyniku
+	xor rax, rax
+	xor rbx, rbx
+	mov rax, sumG
+	cmp rax, 255		;przycinanie wyniku
 	JB LESS_G
-	mov eax, 255
+	mov rax, 255
+	mov sumG, rax
 	JMP BLUE
 LESS_G:
-	cmp eax, 0
+	cmp rax, 0
 	JA BLUE
-	mov ebx, 0
+	mov rax, 0
+	mov sumG, rax
 
 BLUE:
-	mov eax, sumB
-	cmp eax, 255		;przycinanie wyniku
+	xor rax, rax
+	xor rbx, rbx
+	mov rax, sumB
+	cmp rax, 255		;przycinanie wyniku
 	JB LESS_B
-	mov eax, 255
+	mov rax, 255
+	mov sumB, rax
 	JMP SAVE
 LESS_B:
-	cmp eax, 0
+	cmp rax, 0
 	JA SAVE
-	mov ebx, 0
+	mov rax, 0
+	mov sumB, rax
 
 SAVE:					; saving new pixel in new image array
 
+	mov rcx, 3
 ; saving RED value
-	mov eax, [iter_y]		
-	mul [x_max]
-	add eax, [iter_x]
-	add eax, 0				; move to RED value
-	add eax, [newImage]
-	mov ebx, sumR;
-	mov [eax], ebx
+	xor rax, rax
+	mov rax, [iter_y]		
+	mul [image_width]
+	mul rcx
+	add rax, [iter_x]
+	add rax, 0				; move to RED value
+	add rax, newImage
+	xor rbx, rbx
+	mov rbx, sumR
+	mov [rax], bl
 
 	; saving GREEN value
-	mov eax, [iter_y]		
-	mul [x_max]
-	add eax, [iter_x]
-	add eax, 1				; move to GREEN value
-	add eax, [newImage]
-	mov ebx, sumG
-	mov [eax], ebx
+	xor rax, rax
+	mov rax, [iter_y]		
+	mul [image_width]
+	mul rcx
+	add rax, [iter_x]
+	add rax, 1				; move to GREEN value
+	add rax, newImage
+	xor rbx, rbx
+	mov rbx, sumG
+	mov [rax], bl
 
 	; saving BLUE value
-	mov eax, [iter_y]		
-	mul [x_max]
-	add eax, [iter_x]
-	add eax, 2				; move to BLUE value
-	add eax, [newImage]
-	mov ebx, sumB
-	mov [eax], ebx
+	xor rax, rax
+	mov rax, [iter_y]		
+	mul [image_width]
+	mul rcx
+	add rax, [iter_x]
+	add rax, 2				; move to BLUE value
+	add rax, newImage
+	xor rbx, rbx
+	mov rbx, sumB
+	mov [rax], bl
 
-	mov eax, [iter_x]		;koniec petli x
-	cmp eax, x_max
+	mov rax, [iter_x]		;koniec petli x
+	cmp rax, x_max
 	JB PETLAX
 
-	mov eax, [iter_y]		;koniec petli y
-	cmp eax, y_max
+	mov rax, [iter_y]		;koniec petli y
+	cmp rax, y_max
 	JB PETLAY
 
-	mov esp, ebp			;zakonczenie
+
 	pop rsp        ;z koncem programu ustawiam spowrotem wartosci rejestrow pobierajac je ze stosu.
     pop rdi                        
     pop rbp
 	
-	mov eax, newImage
+	xor rax, rax
 	ret
 
 laplaceFilter endp
