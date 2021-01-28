@@ -261,10 +261,8 @@ PETLAX:
 	xor rbx, rbx
 	mov bl, [rax]
 	xor rax, rax
-	mov al, bl				; value from [position]	
-	xor rbx, rbx
-	mov ebx, [LAPLACE_MASK + 16]
-	imul rbx
+	mov al, bl				; value from [position]	 
+	imul [LAPLACE_MASK + 16]
 	add sumR, eax
 
 	; middle middle pixel GREEN
@@ -335,7 +333,7 @@ PETLAX:
 	xor rbx, rbx
 	mov bl, [rax]
 	xor rax, rax
-	mov al, al 
+	mov al, bl 
 	imul [LAPLACE_MASK + 20]
 	add sumB, eax
 
@@ -575,8 +573,16 @@ SAVE:					; saving new pixel in new image array
 	pop rsp        ;z koncem programu ustawiam spowrotem wartosci rejestrow pobierajac je ze stosu.
     pop rdi                        
     pop rbp
-	
-	xor rax, rax
+
+	xor rax, rax	
+	xor rbx, rbx
+	xor rcx, rcx
+	xor rdx, rdx
+	xor r8, r8
+	xor r9, r9
+	mov image, rax
+	mov newImage, rax
+
 	ret
 
 laplaceFilter endp

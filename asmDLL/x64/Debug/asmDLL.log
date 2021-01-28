@@ -1,2 +1,5 @@
 ﻿  Assembling SourceAsm.asm...
+  pch.cpp
+  dllmain.cpp
+     Creating library G:\Dokumenty\Uczelnia\JA\projekt\repo\FiltrLaplacea\x64\Debug\asmDLL.lib and object G:\Dokumenty\Uczelnia\JA\projekt\repo\FiltrLaplacea\x64\Debug\asmDLL.exp
   asmDLL.vcxproj -> G:\Dokumenty\Uczelnia\JA\projekt\repo\FiltrLaplacea\x64\Debug\asmDLL.dll

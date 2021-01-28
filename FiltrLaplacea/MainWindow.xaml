@@ -11,10 +11,12 @@
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="1*" />
             <ColumnDefinition Width="2*" />
+            <ColumnDefinition Width="2*" />
         </Grid.ColumnDefinitions>
 
-        <Grid Grid.Column="0" Background="#FFC1C1C1" Margin="0,0,174,0">
+        <Grid Grid.Column="0" Background="#FFC1C1C1">
             <Grid.RowDefinitions>
+                <RowDefinition Height="1*" />
                 <RowDefinition Height="1*" />
                 <RowDefinition Height="1*" />
                 <RowDefinition Height="1*" />
@@ -25,25 +27,37 @@
                 <Grid.RowDefinitions>
                     <RowDefinition Height="1*" />
                     <RowDefinition Height="1*" />
-                    <RowDefinition Height="1*" />
                 </Grid.RowDefinitions>
-                <Label Grid.Row="0" HorizontalAlignment="Center" Margin="10">Wybierz język</Label>
+                <Label Grid.Row="0" VerticalAlignment="Bottom" HorizontalAlignment="Center" Margin="10">Wybierz język</Label>
                 <Grid Grid.Row="1">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="1*" />
                         <ColumnDefinition Width="1*" />
                     </Grid.ColumnDefinitions>
-                    <RadioButton Grid.Column="0" HorizontalAlignment="Right" Margin="5">Assembler</RadioButton>
-                    <RadioButton Grid.Column="1" HorizontalAlignment="Left" Margin="5">C++</RadioButton>
+                    <RadioButton Grid.Column="0" HorizontalAlignment="Right" Margin="5" Name="RadioAsm">Assembler</RadioButton>
+                    <RadioButton Grid.Column="1" HorizontalAlignment="Left" Margin="5" Name="RadioCs" IsChecked="true">C#</RadioButton>
 
                 </Grid>
             </Grid>
             <Grid Grid.Row="2">
-                <Button Grid.Row="0" Margin="40" Click="btn_FilterImage">Filtruj</Button>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="1*"/>
+                    <RowDefinition Height="1*"/>
+                </Grid.RowDefinitions>
+                <Button Name="btnFilter" Grid.Row="0" Margin="5" Click="btn_FilterImage" Grid.ColumnSpan="2">Filtruj</Button>
+                <Button Name="btnSave" Grid.Row="1" Margin="5" Click="btn_SaveImage" IsEnabled="False" Grid.ColumnSpan="2">Zapisz</Button>
+            </Grid>
+            <Grid Grid.Row="3">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="1*" />
+                    <ColumnDefinition Width="1*" />
+                </Grid.ColumnDefinitions>
+                <Label FontSize="12" Grid.Column="0" HorizontalAlignment="Right" VerticalAlignment="Center">Czas wykonywania:</Label>
+                <Label Name="timerLabel" FontWeight="Bold" FontSize="16" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Center">00:00:00</Label>
             </Grid>
         </Grid>
 
-        <Grid Margin="212,0,528,0" Grid.ColumnSpan="2">
+        <Grid  Grid.Column="1" >
             <Grid.RowDefinitions>
                 <RowDefinition Height="369*"/>
                 <RowDefinition Height="50*"/>
@@ -53,8 +67,9 @@
             </Grid.Background>
         </Grid>
 
-        <Grid Grid.Column="1" HorizontalAlignment="Right" Width="523">
-            <lvc:CartesianChart Margin="-51,0,0,0" Height="419" VerticalAlignment="Top" Content="" HorizontalAlignment="Right" Width="501"/>
-        </Grid>
+        <lvc:CartesianChart Series="{Binding SeriesCollection}" LegendLocation="Right" Grid.Column="2" Name="chart">
+
+        </lvc:CartesianChart>
+
     </Grid>
 </Window>

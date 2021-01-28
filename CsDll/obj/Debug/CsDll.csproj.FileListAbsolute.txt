@@ -1,0 +1,11 @@
+G:\Dokumenty\Uczelnia\JA\projekt\pomoc naukowa\Sepia-master\CsDll\bin\Debug\CsDll.dll
+G:\Dokumenty\Uczelnia\JA\projekt\pomoc naukowa\Sepia-master\CsDll\bin\Debug\CsDll.pdb
+G:\Dokumenty\Uczelnia\JA\projekt\pomoc naukowa\Sepia-master\CsDll\obj\Debug\CsDll.csprojAssemblyReference.cache
+G:\Dokumenty\Uczelnia\JA\projekt\pomoc naukowa\Sepia-master\CsDll\obj\Debug\CsDll.csproj.CoreCompileInputs.cache
+G:\Dokumenty\Uczelnia\JA\projekt\pomoc naukowa\Sepia-master\CsDll\obj\Debug\CsDll.dll
+G:\Dokumenty\Uczelnia\JA\projekt\pomoc naukowa\Sepia-master\CsDll\obj\Debug\CsDll.pdb
+G:\Dokumenty\Uczelnia\JA\projekt\repo\CsDll\bin\Debug\CsDll.dll
+G:\Dokumenty\Uczelnia\JA\projekt\repo\CsDll\bin\Debug\CsDll.pdb
+G:\Dokumenty\Uczelnia\JA\projekt\repo\CsDll\obj\Debug\CsDll.csproj.CoreCompileInputs.cache
+G:\Dokumenty\Uczelnia\JA\projekt\repo\CsDll\obj\Debug\CsDll.dll
+G:\Dokumenty\Uczelnia\JA\projekt\repo\CsDll\obj\Debug\CsDll.pdb
