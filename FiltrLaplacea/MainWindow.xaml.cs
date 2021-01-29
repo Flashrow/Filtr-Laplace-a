@@ -13,6 +13,7 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Runtime.Remoting.Messaging;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -32,7 +33,7 @@ namespace FiltrLaplace
 	/// <summary>
 	/// Logika interakcji dla klasy MainWindow.xaml
 	/// </summary>
-	delegate void laplaceFilter_Delegate(byte[] image, int width, int height, byte[] filteredImage);
+	
 	
 
 	public partial class MainWindow : Window
@@ -50,6 +51,7 @@ namespace FiltrLaplace
 		[return: MarshalAs(UnmanagedType.Bool)]
 		public static extern bool DeleteObject([In] IntPtr hObject);
 
+		delegate void laplaceFilter_Delegate(byte[] image, int width, int height, byte[] filteredImage);
 		laplaceFilter_Delegate laplaceDelegate;
 
 		Bitmap bitmapImage;
@@ -64,8 +66,26 @@ namespace FiltrLaplace
 		}
 
 		private void btn_SaveImage(object sender, RoutedEventArgs e)
-		{ 
-		
+		{
+			SaveFileDialog saveFileDialog = new SaveFileDialog();
+			saveFileDialog.Filter = "JPG (*.jpg)|*.jpg|PNG (*.png)|*.png";
+			if (saveFileDialog.ShowDialog() == true)
+			{
+				var fileName = saveFileDialog.FileName;
+				var extension = System.IO.Path.GetExtension(saveFileDialog.FileName);
+
+				switch (extension.ToLower())
+				{
+					case ".jpg":
+						bitmapImage.Save(fileName, System.Drawing.Imaging.ImageFormat.Jpeg);
+						break;
+					case ".png":
+						bitmapImage.Save(fileName, System.Drawing.Imaging.ImageFormat.Png);
+						break;
+					default:
+						throw new ArgumentOutOfRangeException(extension);
+				}
+			}
 		}
 
 			private void btn_AddImage(object sender, RoutedEventArgs e)
@@ -158,12 +178,134 @@ namespace FiltrLaplace
 
 			Stopwatch stopWatch = new Stopwatch();
 			stopWatch.Start();
-			laplaceDelegate(image, width, height, newImage);
+			//laplaceDelegate(image, width, height, newImage);
+			multiThreadFiltering(1, image, width, height, newImage);
 			stopWatch.Stop();
 			setTimerLabel(stopWatch.ElapsedMilliseconds);
 
 			btnFilter.IsEnabled = false;
 		}
+
+		void multiThreadFiltering(int numberOfThreads, byte[] image, int width, int height, byte[] newImage)
+        {
+			int moduloHeight = height % numberOfThreads;
+			int subArrayHeight = (int)(height / numberOfThreads);
+
+			 byte[][] subArrays = new byte[numberOfThreads][];
+			int subArrayPosition = 0;
+			byte[][] filteredSubArrays = new byte[numberOfThreads][];
+
+			List<Thread> threads = new List<Thread>();
+
+			for (int y = 0; y< height - moduloHeight - 1; y+= subArrayHeight)
+            {
+				int startIndex = y;
+				int endIndex = y + subArrayHeight;			
+
+				if (moduloHeight > 0)
+                {
+					endIndex += 1;
+					moduloHeight--;
+                }
+
+				if (endIndex < height)
+					endIndex += 1;
+
+				//subArrays[subArrayPosition] = image.Take(7).ToArray();
+
+				subArrays[subArrayPosition] = new byte[endIndex * width * 3 - startIndex * width * 3];
+
+				//Debug.WriteLine("Array length:" + image.Length);
+				//Debug.WriteLine("Sub array height:" + subArrayHeight);
+				//Debug.WriteLine("Start index:" + startIndex + ", array position:" + startIndex * width * 3);
+				//Debug.WriteLine("End index:" + endIndex + ", array position:" + endIndex * width * 3);
+
+				int tempArrayPosition = subArrayPosition;
+				Array.Copy(image,	
+								startIndex * width * 3, 
+								subArrays[tempArrayPosition],
+								0,
+								endIndex * width * 3 - startIndex * width * 3);
+
+				//Debug.WriteLine("thread height parameter: " + (endIndex - startIndex));
+				//Debug.WriteLine("New " + (endIndex - startIndex));
+
+				filteredSubArrays[tempArrayPosition] = new byte[endIndex * width * 3 - startIndex * width * 3];
+
+				FilteringData data = new FilteringData(subArrays[tempArrayPosition], width, endIndex - startIndex, filteredSubArrays[tempArrayPosition], laplaceDelegate);
+
+				Thread thread = new Thread(data.filtering);
+				thread.Start(data);
+				threads.Add(thread);
+				
+				subArrayPosition++;
+				Task.Delay(2000);
+			}
+
+
+			int currentHeight = 0;
+
+			for(int i = 0; i < numberOfThreads; i++)
+            {
+				threads[i].Join();
+				byte[] subImage = filteredSubArrays[i];
+				//Debug.WriteLine("Thread "+ i + " array length: " + subImage.Length);
+				//Debug.WriteLine("Thread "+ i + " array height: " + subImage.Length/ (width * 3));
+
+                if (i == 0)
+                {
+					Array.Copy(subImage,
+								0,
+								newImage,
+								currentHeight,
+								subImage.Length - width*3);
+					currentHeight += subImage.Length / (width * 3) - 1;
+					
+				}
+				else
+                {
+					
+					Array.Copy(subImage,
+								width*3,
+								newImage,
+								currentHeight * width * 3,
+								subImage.Length - width * 3 - 1);
+					currentHeight += subImage.Length / (width * 3);
+					
+				}
+				//printImage(subImage, width, subImage.Length / (width*3));
+            }
+			//Debug.WriteLine("");
+			//Debug.WriteLine("Filtered Image:");
+			//printImage(newImage, width, height);
+		}
+
+		class FilteringData
+		{
+			private byte[] image;
+			private int width;
+			private int height;
+			private byte[] filtered;
+            private laplaceFilter_Delegate laplaceDelegate;
+
+            public FilteringData(byte[] image, int width, int height, byte[] filtered, laplaceFilter_Delegate fun_delegate)
+            {
+				this.image = image;
+				this.width = width;
+				this.height = height;
+				this.filtered = filtered;
+				this.laplaceDelegate = fun_delegate;
+
+				Debug.WriteLine("Image array:" + this.image);
+				Debug.WriteLine("Filtered array:" + this.filtered);
+            }
+
+            public void filtering(object data)
+            {
+				FilteringData cast = (FilteringData)data;
+				cast.laplaceDelegate(cast.image, cast.width, cast.height, cast.filtered);
+			}
+		};
 
 		void setTimerLabel(long elapsedMs)
         {

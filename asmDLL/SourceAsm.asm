@@ -2,7 +2,6 @@
 	image DQ ?
 	newImage DQ ?
 	LAPLACE_MASK SDWORD 1, 1, 1, 1, -8, 1, 1, 1, 1
-	musk_dividor dd 1
 	iter_x DQ 0
 	x_max DQ 0
 	iter_y DQ 0
@@ -17,9 +16,9 @@
 .code
 laplaceFilter proc EXPORT
 
-	push RBP        ; zapisuje adresy rejestrow RBP,RDI,RSP, aby po wykonaniu procedury, zachowac spojnosc w pamieci
-    push RDI                
-    push RSP
+	push rbp        ; zapisuje adresy rejestrow RBP,RDI,RSP, aby po wykonaniu procedury, zachowac spojnosc w pamieci
+    push rdi                
+    push rsp
 
 	xor rax, rax
 
