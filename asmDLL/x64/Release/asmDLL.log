@@ -1,0 +1,9 @@
+﻿  Assembling SourceAsm.asm...
+  pch.cpp
+  dllmain.cpp
+     Creating library G:\Dokumenty\Uczelnia\JA\projekt\repo\FiltrLaplacea\x64\Release\asmDLL.lib and object G:\Dokumenty\Uczelnia\JA\projekt\repo\FiltrLaplacea\x64\Release\asmDLL.exp
+  Generating code
+  Previous IPDB not found, fall back to full compilation.
+  All 1 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
+  Finished generating code
+  asmDLL.vcxproj -> G:\Dokumenty\Uczelnia\JA\projekt\repo\FiltrLaplacea\x64\Release\asmDLL.dll

@@ -149,15 +149,32 @@ namespace FiltrLaplace
 		void runInAsm(byte[] image, int width, int height, byte[] filteredImage)
 		{
 			//IntPtr Handle = LoadLibrary(@"G:\Dokumenty\Uczelnia\JA\projekt\repo\FiltrLaplacea\x64\Debug\asmDLL.dll");
+			//Handle = LoadLibrary(@"./asmDLL.dll");
+
 			IntPtr Handle = LoadLibrary(@"./asmDLL.dll");
 			IntPtr funcaddr = GetProcAddress(Handle, "laplaceFilter");
-			laplaceFilter_Delegate function = Marshal.GetDelegateForFunctionPointer(funcaddr, typeof(laplaceFilter_Delegate)) as laplaceFilter_Delegate;
-			function.Invoke(image, width, height, filteredImage);
+
+			if (Handle != IntPtr.Zero && funcaddr != IntPtr.Zero)
+			{
+				//funcaddr = GetProcAddress(Handle, "laplaceFilter");
+				laplaceFilter_Delegate function = Marshal.GetDelegateForFunctionPointer(funcaddr, typeof(laplaceFilter_Delegate)) as laplaceFilter_Delegate;
+				function.Invoke(image, width, height, filteredImage);
+               //FreeLibrary(Handle);
+				//Handle = IntPtr.Zero;
+			}
+			else
+			{
+				Debug.WriteLine("Handle is null");
+			}
+
+			FreeLibrary(Handle);
+			Handle = IntPtr.Zero;
 		}
 
 		void runInCs(byte[] image, int width, int height, byte[] filteredImage)
 		{
 			//var DLL = Assembly.LoadFile(@"G:\Dokumenty\Uczelnia\JA\projekt\repo\CsDll\bin\Debug\CsDll.dll");
+			
 			var dllFile = new FileInfo(@"./CsDll.dll");
 			var DLL = Assembly.LoadFile(dllFile.FullName);
 			var class1Type = DLL.GetType("CsDll.Class1");
@@ -205,6 +222,7 @@ namespace FiltrLaplace
 			int subArrayPosition = 0;
 
 			List<Thread> threads = new List<Thread>();
+			List<FilteringData> dataList = new List<FilteringData>();
 
 			for (int y = 0; y< height - moduloHeight - 1; y+= subArrayHeight)
             {
@@ -247,20 +265,30 @@ namespace FiltrLaplace
 
 				FilteringData data = new FilteringData(subArrays[tempArrayPosition], width, endIndex - startIndex, filteredSubArrays[tempArrayPosition], laplaceDelegate);
 
+
 				Thread thread = new Thread(data.filtering);
-				thread.Start(data);
 				threads.Add(thread);
-				
+				dataList.Add(data);
+				//threads.Last().IsBackground = true;
+				//threads.Last().Start(data);
+
 				subArrayPosition++;
-				Task.Delay(2000);
 			}
 
+			int j = 0;
+			threads.ForEach(thread =>
+			{
+				thread.IsBackground = true;
+				thread.Start(dataList[j]);
+				j++;
+			});
 
 			int currentHeight = 0;
 			int subImageHeightSum = 0;
 			for(int i = 0; i < numberOfThreads; i++)
             {
 				threads[i].Join();
+				
 				byte[] subImage = filteredSubArrays[i];
 				//printImage(subImage,width, subImage.Length / (width * 3));
 				//Debug.WriteLine("Thread "+ i + " array length: " + subImage.Length);
@@ -295,6 +323,9 @@ namespace FiltrLaplace
 				}
 				//printImage(subImage, width, subImage.Length / (width*3));
             }
+
+			threads.Clear();
+
 			//Debug.WriteLine("Sub images height sum: " + subImageHeightSum);
 			//Debug.WriteLine("Picture height: " + height);
 			//Debug.WriteLine("Filtered Image:");

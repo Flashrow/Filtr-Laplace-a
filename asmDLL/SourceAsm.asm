@@ -19,7 +19,6 @@ laplaceFilter proc EXPORT
 	push rbp        ; zapisuje adresy rejestrow RBP,RDI,RSP, aby po wykonaniu procedury, zachowac spojnosc w pamieci
     push rdi                
     push rsp
-	push rbx
 	push rsi
 
 	xor rax, rax
@@ -584,7 +583,6 @@ SAVE:					; zapisywanie nowych wartoœci punktu do tablicy
 
 					;z koncem programu ustawiam spowrotem wartosci rejestrow pobierajac je ze stosu.
 	pop rsi
-	pop rbx
 	pop rsp    
     pop rdi                        
     pop rbp
