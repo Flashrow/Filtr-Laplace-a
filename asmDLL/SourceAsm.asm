@@ -19,74 +19,76 @@ laplaceFilter proc EXPORT
 	push rbp        ; zapisuje adresy rejestrow RBP,RDI,RSP, aby po wykonaniu procedury, zachowac spojnosc w pamieci
     push rdi                
     push rsp
+	push rbx
+	push rsi
 
 	xor rax, rax
 
-	;zapisanie wskaznikow na tablice w rejestrach
 	
-	mov rax, rcx
+	
+	mov rax, rcx						
 	mov image, rax
 	;mov rcx, QWORD PTR [rax]
 
-	;zapisanie width i height w zmiennych
-	mov rax, rdx
+	
+	mov rax, rdx						;zapisanie width i height w zmiennych
 	mov rbx, 3
 	mul rbx
 	mov [image_width], rax
 	mov rax, r8
 	mov [height], rax
 
-	mov newImage, r9
+	mov newImage, r9					; zapisanie wskaŸnika na tablicê
 	;mov rcx, [newImage]
 
-	;ustawienie iter_x_max i iter_y_max
-	mov rax, [image_width]
+	mov rax, [image_width]				; ustawienie iter_x_max i iter_y_max
 	sub rax, 6
 	mov [x_max], rax
 	mov rax, [height]
 	sub rax, 2
 	mov [y_max], rax
 
-	;iteracja przez tablice
-PETLAY:
+PETLAY:									; pêtla po wartoœciach y
 	mov ecx, 0
 	mov edi, 0
 	inc [iter_y]
 	mov [iter_x], 0
 
-PETLAX:
+PETLAX:									; pêtla po wartoœciach x
 	add iter_x, 3
 
 	xor rax, rax
 
-	mov sumR, eax;
-	mov sumG, eax;
-	mov sumB, eax;
+	mov sumR, eax						
+	mov sumG, eax
+	mov sumB, eax
 
 
 ; #################### TOP LEFT ############################
 	; top left pixel RED
-	mov rax, [iter_y]		
-	dec rax
-	mul [image_width]
-	add rax, [iter_x]
-	sub rax, 3				; move one pixel left
-	add rax, 0				; go to RED value
-	add rax, image
+	mov rax, [iter_y]		; przejœcie do bie¿¹cej pozycji Y
+	dec rax					; przejœcie jeden piksel do góry
+	mul [image_width]		; wybranie odpowiedniej pozycji w tablicy
+	add rax, [iter_x]		; przesuniêcie na odpowiedni¹ pozycjê Y
+	sub rax, 3				; przesuñ jeden pixel w lewo
+	add rax, 0				; wybranie wartoœci R - czerwony
+	add rax, image			; przejœcie do odpowiedniego miejsca w pamiêci
 	xor rbx, rbx
-	mov bl, [rax]			; value from [position]		; saving pixel position to rbx
+	mov bl, [rax]			; odczytanie wartoœci R z wybranego punktu
 	xor rax, rax
 	mov eax, ebx
-	imul [LAPLACE_MASK + 0]
-	add sumR, eax
+	imul [LAPLACE_MASK + 0]	; na³o¿enie maski
+	add sumR, eax			; zaktualizowanie sumy
+							
+			; ka¿dy kolejny punkt jest analogicznie procesowany
 
 	; top left pixel GREEN
 	mov rax, [iter_y]		
 	dec rax
 	mul [image_width]
 	add rax, [iter_x]
-	sub rax, 3				; move one pixel left
-	add rax, 1				; go to GREEN value
+	sub rax, 3				
+	add rax, 1				
 	add rax, image
 	xor rbx, rbx
 	mov bl, [rax]
@@ -100,8 +102,8 @@ PETLAX:
 	dec rax
 	mul [image_width]
 	add rax, [iter_x]
-	sub rax, 3				; move one pixel left
-	add rax, 2				; go to BLUE value
+	sub rax, 3				
+	add rax, 2				
 	add rax, image
 	xor rbx, rbx
 	mov bl, [rax]
@@ -117,11 +119,11 @@ PETLAX:
 	dec rax
 	mul [image_width]
 	add rax, [iter_x]
-	add rax, 0				; stay middle pixel
-	add rax, 0				; go to RED value
+	add rax, 0				
+	add rax, 0				
 	add rax, image
 	xor rbx, rbx
-	mov bl, [rax]			; value from [position]		
+	mov bl, [rax]				
 	xor rax, rax
 	mov al, bl
 	imul [LAPLACE_MASK + 4]
@@ -132,8 +134,8 @@ PETLAX:
 	dec rax
 	mul [image_width]
 	add rax, [iter_x]
-	add rax, 0				; stay middle pixel
-	add rax, 1				; go to GREEN value
+	add rax, 0				
+	add rax, 1				
 	add rax, image
 	xor rbx, rbx
 	mov rbx, [rax]
@@ -147,8 +149,8 @@ PETLAX:
 	dec rax
 	mul [image_width]
 	add rax, [iter_x]
-	add rax, 0				; stay middle pixel
-	add rax, 2				; go to BLUE value
+	add rax, 0				
+	add rax, 2				
 	add rax, image
 	xor rbx, rbx
 	mov bl, [rax]
@@ -164,11 +166,11 @@ PETLAX:
 	dec rax
 	mul [image_width]
 	add rax, [iter_x]
-	add rax, 3				; go one pixel right
-	add rax, 0				; go to RED value
+	add rax, 3				
+	add rax, 0				
 	add rax, image
 	xor rbx, rbx
-	mov bl, [rax]			; value from [position]		
+	mov bl, [rax]					
 	xor rax, rax
 	mov al, bl
 	imul [LAPLACE_MASK + 8]
@@ -179,8 +181,8 @@ PETLAX:
 	dec rax
 	mul [image_width]
 	add rax, [iter_x]
-	add rax, 3				; go one pixel right
-	add rax, 1				; go to GREEN value
+	add rax, 3				
+	add rax, 1				
 	add rax, image
 	xor rbx, rbx
 	mov bl, [rax]
@@ -194,8 +196,8 @@ PETLAX:
 	dec rax
 	mul [image_width]
 	add rax, [iter_x]
-	add rax, 3				; go one pixel right
-	add rax, 2				; go to BLUE value
+	add rax, 3				
+	add rax, 2				
 	add rax, image
 	xor rbx, rbx
 	mov bl, [rax]
@@ -210,13 +212,13 @@ PETLAX:
 	mov rax, [iter_y]		
 	mul [image_width]
 	add rax, [iter_x]
-	sub rax, 3				; go one pixel left
-	add rax, 0				; go to RED value
+	sub rax, 3				
+	add rax, 0				
 	add rax, image
 	xor rbx, rbx
 	mov bl, [rax]			
 	xor rax, rax
-	mov al, bl			; value from [position]		
+	mov al, bl				
 	imul [LAPLACE_MASK + 12]
 	add sumR, eax
 
@@ -224,8 +226,8 @@ PETLAX:
 	mov rax, [iter_y]	
 	mul [image_width]
 	add rax, [iter_x]
-	sub rax, 3				; go one pixel left
-	add rax, 1				; go to GREEN value
+	sub rax, 3				
+	add rax, 1				
 	add rax, image
 	xor rbx, rbx
 	mov bl, [rax]
@@ -238,8 +240,8 @@ PETLAX:
 	mov rax, [iter_y]	
 	mul [image_width]
 	add rax, [iter_x]
-	sub rax, 3				; go one pixel left
-	add rax, 2				; go to BLUE value
+	sub rax, 3				
+	add rax, 2				
 	add rax, image
 	xor rbx, rbx
 	mov bl, [rax]
@@ -254,13 +256,13 @@ PETLAX:
 	mov rax, [iter_y]		
 	mul [image_width]
 	add rax, [iter_x]
-	sub rax, 0				; don't move pixel
-	add rax, 0				; go to RED value
+	sub rax, 0				
+	add rax, 0				
 	add rax, image
 	xor rbx, rbx
 	mov bl, [rax]
 	xor rax, rax
-	mov al, bl				; value from [position]	 
+	mov al, bl				 
 	imul [LAPLACE_MASK + 16]
 	add sumR, eax
 
@@ -268,8 +270,8 @@ PETLAX:
 	mov rax, [iter_y]	
 	mul [image_width]
 	add rax, [iter_x]
-	sub rax, 0				; don't move pixel
-	add rax, 1				; go to GREEN value
+	sub rax, 0				
+	add rax, 1				
 	add rax, image
 	xor rbx, rbx
 	mov bl, [rax]
@@ -282,8 +284,8 @@ PETLAX:
 	mov rax, [iter_y]	
 	mul [image_width]
 	add rax, [iter_x]
-	sub rax, 0				; don't move pixel
-	add rax, 2				; go to BLUE value
+	sub rax, 0				
+	add rax, 2				
 	add rax, image
 	xor rbx, rbx
 	mov bl, [rax]
@@ -298,13 +300,13 @@ PETLAX:
 	mov rax, [iter_y]		
 	mul [image_width]
 	add rax, [iter_x]
-	add rax, 3				; go one pixel right
-	add rax, 0				; go to RED value
+	add rax, 3				
+	add rax, 0				
 	add rax, image
 	xor rbx, rbx
 	mov bl, [rax]
 	xor rax, rax
-	mov al, bl				; value from [position]		
+	mov al, bl						
 	imul [LAPLACE_MASK + 20]
 	add sumR, eax
 
@@ -312,8 +314,8 @@ PETLAX:
 	mov rax, [iter_y]	
 	mul [image_width]
 	add rax, [iter_x]
-	add rax, 3				; go one pixel right
-	add rax, 1				; go to GREEN value
+	add rax, 3				
+	add rax, 1				
 	add rax, image
 	xor rbx, rbx
 	mov bl, [rax]
@@ -326,8 +328,8 @@ PETLAX:
 	mov rax, [iter_y]		
 	mul [image_width]
 	add rax, [iter_x]
-	add rax, 3				; go one pixel right
-	add rax, 2				; go to BLUE value
+	add rax, 3				
+	add rax, 2				
 	add rax, image
 	xor rbx, rbx
 	mov bl, [rax]
@@ -340,14 +342,14 @@ PETLAX:
 ; #################### BOTTOM LEFT ############################
 	; bottom left pixel RED
 	mov rax, [iter_y]	
-	inc rax				; go one pixel down
+	inc rax				
 	mul [image_width]
 	add rax, [iter_x]
-	sub rax, 3				; go one pixel left
-	add rax, 0				; go to RED value
+	sub rax, 3				
+	add rax, 0				
 	add rax, image
 	xor rbx, rbx
-	mov bl, [rax]			; saving pixel position to rbx
+	mov bl, [rax]			
 	xor rax, rax
 	mov al, bl	
 	imul [LAPLACE_MASK + 24]																	
@@ -355,11 +357,11 @@ PETLAX:
 																							
 	; bottom left pixel GREEN
 	mov rax, [iter_y]	
-	inc rax				; go one pixel down
+	inc rax				
 	mul [image_width]
 	add rax, [iter_x]
-	sub rax, 3				; go one pixel left
-	add rax, 1				; go to GREEN value
+	sub rax, 3				
+	add rax, 1				
 	add rax, image
 	xor rbx, rbx
 	mov bl, [rax]
@@ -370,11 +372,11 @@ PETLAX:
 
 	; bottom left pixel BLUE
 	mov rax, [iter_y]		
-	inc rax				; go one pixel down
+	inc rax				
 	mul [image_width]
 	add rax, [iter_x]
-	sub rax, 3				; go one pixel left
-	add rax, 2				; go to BLUE value
+	sub rax, 3				
+	add rax, 2				
 	add rax, image
 	xor rbx, rbx
 	mov bl, [rax]
@@ -387,11 +389,11 @@ PETLAX:
 ; #################### BOTTOM MIDDLE ############################
 	; bottom middle pixel RED
 	mov rax, [iter_y]	
-	inc rax				; go one pixel down
+	inc rax				
 	mul [image_width]
 	add rax, [iter_x]
-	sub rax, 0				; don't move pixel
-	add rax, 0				; go to RED value
+	sub rax, 0				
+	add rax, 0				
 	add rax, image
 	xor rbx, rbx
 	mov bl, [rax]
@@ -402,11 +404,11 @@ PETLAX:
 
 	; bottom middle pixel GREEN
 	mov rax, [iter_y]	
-	inc rax				; go one pixel down
+	inc rax				
 	mul [image_width]
 	add rax, [iter_x]
-	sub rax, 0				; don't move pixel
-	add rax, 1				; go to GREEN value
+	sub rax, 0				
+	add rax, 1				
 	add rax, image
 	xor rbx, rbx
 	mov bl, [rax]
@@ -417,11 +419,11 @@ PETLAX:
 
 	; bottom middle pixel BLUE
 	mov rax, [iter_y]		
-	inc rax				; go one pixel down
+	inc rax				
 	mul [image_width]
 	add rax, [iter_x]
-	sub rax, 0				; don't move pixel
-	add rax, 2				; go to BLUE value
+	sub rax, 0				
+	add rax, 2				
 	add rax, image
 	xor rbx, rbx
 	mov bl, [rax]
@@ -434,11 +436,11 @@ PETLAX:
 ; #################### BOTTOM RIGHT ############################
 	; bottom right pixel RED
 	mov rax, [iter_y]	
-	inc rax				; go one pixel down
+	inc rax				
 	mul [image_width]
 	add rax, [iter_x]
-	add rax, 3				; go one pixel right
-	add rax, 0				; go to RED value
+	add rax, 3				
+	add rax, 0				
 	add rax, image
 	xor rbx, rbx
 	mov bl, [rax]
@@ -449,11 +451,11 @@ PETLAX:
 
 	; bottom right pixel GREEN
 	mov rax, [iter_y]	
-	inc rax				; go one pixel down
+	inc rax				
 	mul [image_width]
 	add rax, [iter_x]
-	add rax, 3				; go one pixel right
-	add rax, 1				; go to GREEN value
+	add rax, 3				
+	add rax, 1				
 	add rax, image
 	xor rbx, rbx
 	mov bl, [rax]
@@ -464,11 +466,11 @@ PETLAX:
 
 	; bottom right pixel BLUE
 	mov rax, [iter_y]	
-	inc rax				; go one pixel down
+	inc rax				
 	mul [image_width]
 	add rax, [iter_x]
-	add rax, 3				; go one pixel right
-	add rax, 2				; go to BLUE value
+	add rax, 3				
+	add rax, 2				
 	add rax, image
 	xor rbx, rbx
 	mov bl, [rax]
@@ -478,27 +480,29 @@ PETLAX:
 	add sumB, eax
 
 
-	; normalizing sums
+	; normalizowanie sum
 	
 	xor rax, rax
 	xor rbx, rbx
 	mov eax, sumR
-	cmp sumR, 255		;przycinanie wyniku
+	cmp sumR, 255		; porównanie z wartoœci¹ górn¹ (255)
 	JL LESS_R
-	mov eax, 255
+	mov eax, 255		; ograniczenie wartoœci do max 255
 	mov sumR, eax
 	JMP GREEN
 LESS_R:
-	cmp eax, 0
+	cmp eax, 0			; porównanie do wartoœci minimalnej
 	JG GREEN
-	mov eax, 0
+	mov eax, 0			; ograniczenie wartoœci minimalnej
 	mov sumR, eax
+
+	; pozosta³e kolory analogicznie
 
 GREEN:
 	xor rax, rax
 	xor rbx, rbx
 	mov eax, sumG
-	cmp sumG, 255		;przycinanie wyniku
+	cmp sumG, 255		
 	JL LESS_G
 	mov eax, 255
 	mov sumG, eax
@@ -513,7 +517,7 @@ BLUE:
 	xor rax, rax
 	xor rbx, rbx
 	mov eax, sumB
-	cmp sumB, 255		;przycinanie wyniku
+	cmp sumB, 255		
 	JL LESS_B
 	mov eax, 255
 	mov sumB, eax
@@ -524,26 +528,26 @@ LESS_B:
 	mov eax, 0
 	mov sumB, eax
 
-SAVE:					; saving new pixel in new image array
+SAVE:					; zapisywanie nowych wartoœci punktu do tablicy
 
 	mov rcx, 3
 ; saving RED value
 	xor rax, rax
-	mov rax, [iter_y]		
-	mul [image_width]
-	add rax, [iter_x]
-	add rax, 0				; move to RED value
-	add rax, newImage
+	mov rax, [iter_y]		; przejœcie do odpowiedniego Y
+	mul [image_width]		; przesuniêcie do miejsca w tablicy
+	add rax, [iter_x]		; przejœcie do odpowiedniego X
+	add rax, 0				; ustawienie czerwonego koloru (R=0, G=1, B=2)
+	add rax, newImage		; przejœcie do odpowiedniego miejsca w pamiêci
 	xor rbx, rbx
 	mov ebx, sumR
-	mov [rax], bl
+	mov [rax], bl			; zapisanie
 
 	; saving GREEN value
 	xor rax, rax
 	mov rax, [iter_y]		
 	mul [image_width]
 	add rax, [iter_x]
-	add rax, 1				; move to GREEN value
+	add rax, 1				; ustawienie zielonego
 	add rax, newImage
 	xor rbx, rbx
 	mov ebx, sumG
@@ -554,7 +558,7 @@ SAVE:					; saving new pixel in new image array
 	mov rax, [iter_y]		
 	mul [image_width]
 	add rax, [iter_x]
-	add rax, 2				; move to BLUE value
+	add rax, 2				; ustawienie niebieskiego
 	add rax, newImage
 	xor rbx, rbx
 	mov ebx, sumB
@@ -569,11 +573,7 @@ SAVE:					; saving new pixel in new image array
 	JB PETLAY
 
 
-	pop rsp        ;z koncem programu ustawiam spowrotem wartosci rejestrow pobierajac je ze stosu.
-    pop rdi                        
-    pop rbp
-
-	xor rax, rax	
+	xor rax, rax	; czyszczenie pozosta³ych rejestrów
 	xor rbx, rbx
 	xor rcx, rcx
 	xor rdx, rdx
@@ -581,6 +581,13 @@ SAVE:					; saving new pixel in new image array
 	xor r9, r9
 	mov image, rax
 	mov newImage, rax
+
+					;z koncem programu ustawiam spowrotem wartosci rejestrow pobierajac je ze stosu.
+	pop rsi
+	pop rbx
+	pop rsp    
+    pop rdi                        
+    pop rbp
 
 	ret
 

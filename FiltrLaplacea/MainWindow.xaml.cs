@@ -30,12 +30,8 @@ using Color = System.Drawing.Color;
 
 namespace FiltrLaplace
 {
-	/// <summary>
-	/// Logika interakcji dla klasy MainWindow.xaml
-	/// </summary>
+	// Główna klasa projektu
 	
-	
-
 	public partial class MainWindow : Window
 	{
 		[DllImport("kernel32.dll", CharSet = CharSet.Auto, SetLastError = true)]
@@ -55,6 +51,7 @@ namespace FiltrLaplace
 		laplaceFilter_Delegate laplaceDelegate;
 
 		Bitmap bitmapImage;
+		Bitmap preparedImageBmp;
 		LaplaceFilter laplaceFilter;
 
 		public SeriesCollection SeriesCollection { get; set; }
@@ -65,6 +62,7 @@ namespace FiltrLaplace
 			InitHistogram();
 		}
 
+		// obsługa zapisywania przefiltrowanej grafiki
 		private void btn_SaveImage(object sender, RoutedEventArgs e)
 		{
 			SaveFileDialog saveFileDialog = new SaveFileDialog();
@@ -77,15 +75,16 @@ namespace FiltrLaplace
 				switch (extension.ToLower())
 				{
 					case ".jpg":
-						bitmapImage.Save(fileName, System.Drawing.Imaging.ImageFormat.Jpeg);
+						preparedImageBmp.Save(fileName, System.Drawing.Imaging.ImageFormat.Jpeg);
 						break;
 					case ".png":
-						bitmapImage.Save(fileName, System.Drawing.Imaging.ImageFormat.Png);
+						preparedImageBmp.Save(fileName, System.Drawing.Imaging.ImageFormat.Png);
 						break;
 					default:
 						throw new ArgumentOutOfRangeException(extension);
 				}
 			}
+			btnSave.IsEnabled = false;
 		}
 
 			private void btn_AddImage(object sender, RoutedEventArgs e)
@@ -105,7 +104,7 @@ namespace FiltrLaplace
 		private void btn_FilterImage(object sender, RoutedEventArgs e)
         {
 			System.Drawing.Rectangle rect = new System.Drawing.Rectangle(0, 0, bitmapImage.Width, bitmapImage.Height);
-			Bitmap preparedImageBmp = bitmapImage.Clone(rect, System.Drawing.Imaging.PixelFormat.Format24bppRgb);
+			preparedImageBmp = bitmapImage.Clone(rect, System.Drawing.Imaging.PixelFormat.Format24bppRgb);
 			System.Drawing.Imaging.BitmapData bmpData = preparedImageBmp.LockBits(rect,
 														System.Drawing.Imaging.ImageLockMode.ReadWrite,
 														preparedImageBmp.PixelFormat);
@@ -144,6 +143,7 @@ namespace FiltrLaplace
 			CreateHistogram(newImage, SeriesCollection);
 			preparedImageBmp.UnlockBits(bmpData);
 			ImageEdit.ImageSource = ImageSourceFromBitmap(preparedImageBmp);
+			btnSave.IsEnabled = true;
         }
 
 		void runInAsm(byte[] image, int width, int height, byte[] filteredImage)
@@ -177,23 +177,32 @@ namespace FiltrLaplace
             }
 
 			Stopwatch stopWatch = new Stopwatch();
+
+			int numberOfThreads = (int)threadNumberSlider.Value;
+
 			stopWatch.Start();
 			//laplaceDelegate(image, width, height, newImage);
-			multiThreadFiltering(1, image, width, height, newImage);
+			multiThreadFiltering(numberOfThreads, image, width, height, newImage);
 			stopWatch.Stop();
 			setTimerLabel(stopWatch.ElapsedMilliseconds);
 
-			btnFilter.IsEnabled = false;
+			//btnFilter.IsEnabled = false;
 		}
 
 		void multiThreadFiltering(int numberOfThreads, byte[] image, int width, int height, byte[] newImage)
         {
+            if (numberOfThreads > height)
+            {
+				numberOfThreads = height;
+            }
+
 			int moduloHeight = height % numberOfThreads;
 			int subArrayHeight = (int)(height / numberOfThreads);
 
-			 byte[][] subArrays = new byte[numberOfThreads][];
-			int subArrayPosition = 0;
+			byte[][] subArrays = new byte[numberOfThreads][];
 			byte[][] filteredSubArrays = new byte[numberOfThreads][];
+
+			int subArrayPosition = 0;
 
 			List<Thread> threads = new List<Thread>();
 
@@ -206,7 +215,11 @@ namespace FiltrLaplace
                 {
 					endIndex += 1;
 					moduloHeight--;
+					y++;
                 }
+
+				if (startIndex > 0)
+					startIndex -= 1;
 
 				if (endIndex < height)
 					endIndex += 1;
@@ -244,15 +257,22 @@ namespace FiltrLaplace
 
 
 			int currentHeight = 0;
-
+			int subImageHeightSum = 0;
 			for(int i = 0; i < numberOfThreads; i++)
             {
 				threads[i].Join();
 				byte[] subImage = filteredSubArrays[i];
+				//printImage(subImage,width, subImage.Length / (width * 3));
 				//Debug.WriteLine("Thread "+ i + " array length: " + subImage.Length);
 				//Debug.WriteLine("Thread "+ i + " array height: " + subImage.Length/ (width * 3));
 
-                if (i == 0)
+				subImageHeightSum += subImage.Length / (width * 3);
+
+				//Debug.WriteLine("New image length:" + newImage.Length);
+				//Debug.WriteLine("current position:" + currentHeight * width * 3);
+				//Debug.WriteLine("end position:" + (currentHeight * width * 3 + (subImage.Length - width * 3)));
+
+				if (i == 0)
                 {
 					Array.Copy(subImage,
 								0,
@@ -263,19 +283,20 @@ namespace FiltrLaplace
 					
 				}
 				else
-                {
-					
+                {				
 					Array.Copy(subImage,
 								width*3,
 								newImage,
 								currentHeight * width * 3,
-								subImage.Length - width * 3 - 1);
-					currentHeight += subImage.Length / (width * 3);
+								subImage.Length - width * 3);
+					
+					currentHeight += subImage.Length / (width * 3) - 2;
 					
 				}
 				//printImage(subImage, width, subImage.Length / (width*3));
             }
-			//Debug.WriteLine("");
+			//Debug.WriteLine("Sub images height sum: " + subImageHeightSum);
+			//Debug.WriteLine("Picture height: " + height);
 			//Debug.WriteLine("Filtered Image:");
 			//printImage(newImage, width, height);
 		}

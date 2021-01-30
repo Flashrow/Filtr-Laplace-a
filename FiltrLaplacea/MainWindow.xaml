@@ -20,15 +20,16 @@
                 <RowDefinition Height="1*" />
                 <RowDefinition Height="1*" />
                 <RowDefinition Height="1*" />
+                <RowDefinition Height="1*" />
             </Grid.RowDefinitions>
-            <Button x:Name="BtnAddImage" Grid.Row="0" Margin="40" Click="btn_AddImage">Wybierz zdjęcie</Button>
+            <Button x:Name="BtnAddImage" Grid.Row="0" Margin="15" Click="btn_AddImage">Wybierz zdjęcie</Button>
 
             <Grid Grid.Row="1">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="1*" />
                     <RowDefinition Height="1*" />
                 </Grid.RowDefinitions>
-                <Label Grid.Row="0" VerticalAlignment="Bottom" HorizontalAlignment="Center" Margin="10">Wybierz język</Label>
+                <Label Grid.Row="0" VerticalAlignment="Bottom" HorizontalAlignment="Center" Margin="5">Wybierz język</Label>
                 <Grid Grid.Row="1">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="1*" />
@@ -54,6 +55,22 @@
                 </Grid.ColumnDefinitions>
                 <Label FontSize="12" Grid.Column="0" HorizontalAlignment="Right" VerticalAlignment="Center">Czas wykonywania:</Label>
                 <Label Name="timerLabel" FontWeight="Bold" FontSize="16" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Center">00:00:00</Label>
+            </Grid>
+            <Grid Grid.Row="4">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="1*"/>
+                    <RowDefinition Height="2*"/>
+                </Grid.RowDefinitions>
+                <Grid Grid.Row="0">
+                    <Label HorizontalAlignment="Center">Ilość wątków</Label>
+                </Grid>
+                <Grid Grid.Row="1">
+                    <DockPanel>
+                        <TextBox Text="{Binding ElementName=threadNumberSlider, Path=Value, UpdateSourceTrigger=PropertyChanged}" DockPanel.Dock="Right" TextAlignment="Left" Width="30" Height="20"  />
+                        <Slider Name="threadNumberSlider" Minimum="1" Maximum="64" VerticalAlignment="Center" Margin="15" TickFrequency="1" IsSnapToTickEnabled="True">
+                        </Slider>
+                    </DockPanel>
+                </Grid>
             </Grid>
         </Grid>
 

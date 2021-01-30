@@ -5,6 +5,8 @@
 #include <wtypes.h>
 
 
+// program do debugowania programu ASM
+
 typedef unsigned char byte;
 typedef int (*CONVERT_TO_RPN)(byte[], int, int, byte[]);
 int main()
