@@ -62,7 +62,7 @@ namespace FiltrLaplace
 			InitHistogram();
 		}
 
-		// obsługa zapisywania przefiltrowanej grafiki
+		// zapisywanie przefiltrowanej grafiki
 		private void btn_SaveImage(object sender, RoutedEventArgs e)
 		{
 			SaveFileDialog saveFileDialog = new SaveFileDialog();
@@ -87,10 +87,9 @@ namespace FiltrLaplace
 			btnSave.IsEnabled = false;
 		}
 
+		// dodawanie grafiki
 			private void btn_AddImage(object sender, RoutedEventArgs e)
         {
-
-
 			OpenFileDialog openFileDialog = new OpenFileDialog();
 			if(openFileDialog.ShowDialog() == true)
             {
@@ -98,22 +97,23 @@ namespace FiltrLaplace
 				ImageEdit.ImageSource = new BitmapImage(new Uri(fileName));
 				bitmapImage = new Bitmap(fileName);
 				CreateHistogram(bitmapImage, SeriesCollection);
+				btnFilter.IsEnabled = true;
 			}
         }
 
+		// przycisk filtrowania, tworzenie bitmapy, odpowiednie jej przetworzenie - usunięcie offsetu na czas filtrowania, 
 		private void btn_FilterImage(object sender, RoutedEventArgs e)
         {
 			System.Drawing.Rectangle rect = new System.Drawing.Rectangle(0, 0, bitmapImage.Width, bitmapImage.Height);
 			preparedImageBmp = bitmapImage.Clone(rect, System.Drawing.Imaging.PixelFormat.Format24bppRgb);
+
 			System.Drawing.Imaging.BitmapData bmpData = preparedImageBmp.LockBits(rect,
 														System.Drawing.Imaging.ImageLockMode.ReadWrite,
 														preparedImageBmp.PixelFormat);
-
 			IntPtr ptr = bmpData.Scan0;
 			int length = Math.Abs(bmpData.Stride) * preparedImageBmp.Height;
 
 			byte[] pixels = new byte[length];
-			//System.Runtime.InteropServices.Marshal.Copy(ptr, pixels, 0, length);
 
 			int pos = 0;
 			int offset = Math.Abs(bmpData.Stride) - preparedImageBmp.Width * 3;
@@ -131,7 +131,6 @@ namespace FiltrLaplace
 						preparedImageBmp.Width,
 						preparedImageBmp.Height,
 						newImage);
-
 			pos = 0;
 			for (int i = 0; i < preparedImageBmp.Height * Math.Abs(bmpData.Stride); i += preparedImageBmp.Width * 3)
 			{
@@ -139,42 +138,39 @@ namespace FiltrLaplace
 				pos += preparedImageBmp.Width * 3;
 				i += offset;
 			}
-
 			CreateHistogram(newImage, SeriesCollection);
 			preparedImageBmp.UnlockBits(bmpData);
 			ImageEdit.ImageSource = ImageSourceFromBitmap(preparedImageBmp);
 			btnSave.IsEnabled = true;
         }
 
+		// załadowanie biblioteki assemblera i uruchomienie procedury z przekazanymi parametrami
 		void runInAsm(byte[] image, int width, int height, byte[] filteredImage)
 		{
 			//IntPtr Handle = LoadLibrary(@"G:\Dokumenty\Uczelnia\JA\projekt\repo\FiltrLaplacea\x64\Debug\asmDLL.dll");
-			//Handle = LoadLibrary(@"./asmDLL.dll");
-
+			
 			IntPtr Handle = LoadLibrary(@"./asmDLL.dll");
 			IntPtr funcaddr = GetProcAddress(Handle, "laplaceFilter");
 
 			if (Handle != IntPtr.Zero && funcaddr != IntPtr.Zero)
 			{
-				//funcaddr = GetProcAddress(Handle, "laplaceFilter");
-				laplaceFilter_Delegate function = Marshal.GetDelegateForFunctionPointer(funcaddr, typeof(laplaceFilter_Delegate)) as laplaceFilter_Delegate;
+				laplaceFilter_Delegate function = 
+					Marshal.GetDelegateForFunctionPointer(funcaddr, typeof(laplaceFilter_Delegate)) as laplaceFilter_Delegate;
 				function.Invoke(image, width, height, filteredImage);
-               //FreeLibrary(Handle);
-				//Handle = IntPtr.Zero;
 			}
 			else
 			{
 				Debug.WriteLine("Handle is null");
 			}
-
 			FreeLibrary(Handle);
 			Handle = IntPtr.Zero;
 		}
 
+		// załadowanie biblioteki C# i uruchomienie funkcji z parametrami
 		void runInCs(byte[] image, int width, int height, byte[] filteredImage)
 		{
 			//var DLL = Assembly.LoadFile(@"G:\Dokumenty\Uczelnia\JA\projekt\repo\CsDll\bin\Debug\CsDll.dll");
-			
+
 			var dllFile = new FileInfo(@"./CsDll.dll");
 			var DLL = Assembly.LoadFile(dllFile.FullName);
 			var class1Type = DLL.GetType("CsDll.Class1");
@@ -182,6 +178,7 @@ namespace FiltrLaplace
 			c.filter(image, width, height, filteredImage);
 		}
 
+		// funkcja uruchamiająca filtrowanie w wybrany sposób(C# lub asm)
 		private void filterImage(byte[] image, int width, int height, byte[] newImage)
         {
             if (RadioAsm.IsChecked == true)
@@ -198,22 +195,22 @@ namespace FiltrLaplace
 			int numberOfThreads = (int)threadNumberSlider.Value;
 
 			stopWatch.Start();
-			//laplaceDelegate(image, width, height, newImage);
 			multiThreadFiltering(numberOfThreads, image, width, height, newImage);
 			stopWatch.Stop();
 			setTimerLabel(stopWatch.ElapsedMilliseconds);
 
-			//btnFilter.IsEnabled = false;
+			btnFilter.IsEnabled = false;
 		}
 
+		// uruchamia programy filtrujące na wybranej ilości wątków i przekazuje im odpowiednie dane 
 		void multiThreadFiltering(int numberOfThreads, byte[] image, int width, int height, byte[] newImage)
         {
-            if (numberOfThreads > height)
+            if (numberOfThreads > height)											// odczytanie ilości wątków z suwaka
             {
 				numberOfThreads = height;
             }
 
-			int moduloHeight = height % numberOfThreads;
+			int moduloHeight = height % numberOfThreads;							// dzielenie wejściowej tablicy w odpowiedni sposób dla wątków
 			int subArrayHeight = (int)(height / numberOfThreads);
 
 			byte[][] subArrays = new byte[numberOfThreads][];
@@ -221,15 +218,15 @@ namespace FiltrLaplace
 
 			int subArrayPosition = 0;
 
-			List<Thread> threads = new List<Thread>();
+			List<Task> threads = new List<Task>();
 			List<FilteringData> dataList = new List<FilteringData>();
 
-			for (int y = 0; y< height - moduloHeight - 1; y+= subArrayHeight)
-            {
+			for (int y = 0; y< height - moduloHeight - 1; y+= subArrayHeight)		// grafika jest dzielona w poziomie, na fragmenty obrazu o wysokości równej: (całkowita wysokość obrazu)/ilość wątków
+            {																		// jeżeli wysokość obrazu nie jest podzielna całkowicie przez ilość wątków to reszta jest równo dzielona na początkowe wątki
 				int startIndex = y;
-				int endIndex = y + subArrayHeight;			
+				int endIndex = y + subArrayHeight;									
 
-				if (moduloHeight > 0)
+				if (moduloHeight > 0)												// przydzielanie reszty z dzielenia wysokości do wątków
                 {
 					endIndex += 1;
 					moduloHeight--;
@@ -242,63 +239,33 @@ namespace FiltrLaplace
 				if (endIndex < height)
 					endIndex += 1;
 
-				//subArrays[subArrayPosition] = image.Take(7).ToArray();
-
 				subArrays[subArrayPosition] = new byte[endIndex * width * 3 - startIndex * width * 3];
 
-				//Debug.WriteLine("Array length:" + image.Length);
-				//Debug.WriteLine("Sub array height:" + subArrayHeight);
-				//Debug.WriteLine("Start index:" + startIndex + ", array position:" + startIndex * width * 3);
-				//Debug.WriteLine("End index:" + endIndex + ", array position:" + endIndex * width * 3);
-
 				int tempArrayPosition = subArrayPosition;
-				Array.Copy(image,	
+				Array.Copy(image,													// tworzenie podgrafiki dla wątku
 								startIndex * width * 3, 
 								subArrays[tempArrayPosition],
 								0,
 								endIndex * width * 3 - startIndex * width * 3);
 
-				//Debug.WriteLine("thread height parameter: " + (endIndex - startIndex));
-				//Debug.WriteLine("New " + (endIndex - startIndex));
-
 				filteredSubArrays[tempArrayPosition] = new byte[endIndex * width * 3 - startIndex * width * 3];
 
 				FilteringData data = new FilteringData(subArrays[tempArrayPosition], width, endIndex - startIndex, filteredSubArrays[tempArrayPosition], laplaceDelegate);
 
-
-				Thread thread = new Thread(data.filtering);
-				threads.Add(thread);
+				threads.Add(Task.Factory.StartNew(data.laplace));					// uruchamianie wątku
 				dataList.Add(data);
-				//threads.Last().IsBackground = true;
-				//threads.Last().Start(data);
 
 				subArrayPosition++;
 			}
 
-			int j = 0;
-			threads.ForEach(thread =>
-			{
-				thread.IsBackground = true;
-				thread.Start(dataList[j]);
-				j++;
-			});
+			Task.WaitAll(threads.ToArray());										// czekanie na zakończenie pracy wątków
 
 			int currentHeight = 0;
 			int subImageHeightSum = 0;
-			for(int i = 0; i < numberOfThreads; i++)
-            {
-				threads[i].Join();
-				
+			for(int i = 0; i < numberOfThreads; i++)								// sklejanie wynikowych tablic w przefiltrowany obrazek
+            {				
 				byte[] subImage = filteredSubArrays[i];
-				//printImage(subImage,width, subImage.Length / (width * 3));
-				//Debug.WriteLine("Thread "+ i + " array length: " + subImage.Length);
-				//Debug.WriteLine("Thread "+ i + " array height: " + subImage.Length/ (width * 3));
-
 				subImageHeightSum += subImage.Length / (width * 3);
-
-				//Debug.WriteLine("New image length:" + newImage.Length);
-				//Debug.WriteLine("current position:" + currentHeight * width * 3);
-				//Debug.WriteLine("end position:" + (currentHeight * width * 3 + (subImage.Length - width * 3)));
 
 				if (i == 0)
                 {
@@ -308,7 +275,6 @@ namespace FiltrLaplace
 								currentHeight,
 								subImage.Length - width*3);
 					currentHeight += subImage.Length / (width * 3) - 1;
-					
 				}
 				else
                 {				
@@ -319,20 +285,12 @@ namespace FiltrLaplace
 								subImage.Length - width * 3);
 					
 					currentHeight += subImage.Length / (width * 3) - 2;
-					
 				}
-				//printImage(subImage, width, subImage.Length / (width*3));
             }
-
 			threads.Clear();
-
-			//Debug.WriteLine("Sub images height sum: " + subImageHeightSum);
-			//Debug.WriteLine("Picture height: " + height);
-			//Debug.WriteLine("Filtered Image:");
-			//printImage(newImage, width, height);
 		}
 
-		class FilteringData
+		class FilteringData									// klasa przechowująca dane potrzebne do filtrowania
 		{
 			private byte[] image;
 			private int width;
@@ -352,6 +310,11 @@ namespace FiltrLaplace
 				Debug.WriteLine("Filtered array:" + this.filtered);
             }
 
+            public void laplace()
+            {
+				laplaceDelegate(this.image, this.width, this.height, this.filtered);
+            }
+
             public void filtering(object data)
             {
 				FilteringData cast = (FilteringData)data;
@@ -364,6 +327,7 @@ namespace FiltrLaplace
 			timerLabel.Content = elapsedMs.ToString() + " ms";
 		}
 
+		// ustawienie wykresu histogramu
 		private void InitHistogram()
 		{
 			chart.AxisY.Clear();
@@ -401,6 +365,7 @@ namespace FiltrLaplace
 			DataContext = this;
 		}
 
+		// wypełnienie danymi wykresu histogramu
 		private void CreateHistogram(Bitmap bitmap, SeriesCollection series)
 		{
 			System.Drawing.Rectangle rect = new System.Drawing.Rectangle(0, 0, bitmapImage.Width, bitmapImage.Height);
@@ -445,6 +410,7 @@ namespace FiltrLaplace
 			}
 		}
 
+		// wypełnienie danymi wykresu histogramu
 		private void CreateHistogram(byte[] rgbValues, SeriesCollection series)
 		{
 			int[] R = new int[256];
@@ -477,6 +443,7 @@ namespace FiltrLaplace
 			}
 		}
 
+		// wypisanie wartości przechowywanych w tablicy
 		private void printImage(byte[] image)
 		{
 			for(int i = 0; i < image.Length; i++)
@@ -485,6 +452,7 @@ namespace FiltrLaplace
             }
 		}
 
+		// wypisanie wartości pikseli grafiki
 		private void printImage(byte[] image, int width, int height)
         {
 			for(int y = 0; y<height; y++)
@@ -496,7 +464,7 @@ namespace FiltrLaplace
             }
         }
 
-
+		// wypisanie porównania dwóch grafik
 		private void compareImagesPrint(byte[] image1, byte[] image2, int width, int height)
 		{
 			for (int y = 0; y < height; y++)
@@ -509,8 +477,7 @@ namespace FiltrLaplace
 				}
 			}
 		}
-
-
+		// konwersja bitmapy na ImageSource
 		public ImageSource ImageSourceFromBitmap(Bitmap bmp)
 		{
 			var handle = bmp.GetHbitmap();

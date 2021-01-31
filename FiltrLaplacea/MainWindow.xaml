@@ -45,7 +45,7 @@
                     <RowDefinition Height="1*"/>
                     <RowDefinition Height="1*"/>
                 </Grid.RowDefinitions>
-                <Button Name="btnFilter" Grid.Row="0" Margin="5" Click="btn_FilterImage" Grid.ColumnSpan="2">Filtruj</Button>
+                <Button Name="btnFilter" Grid.Row="0" Margin="5" Click="btn_FilterImage" Grid.ColumnSpan="2" IsEnabled="False">Filtruj</Button>
                 <Button Name="btnSave" Grid.Row="1" Margin="5" Click="btn_SaveImage" IsEnabled="False" Grid.ColumnSpan="2">Zapisz</Button>
             </Grid>
             <Grid Grid.Row="3">
