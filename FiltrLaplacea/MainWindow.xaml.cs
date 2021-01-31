@@ -265,6 +265,11 @@ namespace FiltrLaplace
 			for(int i = 0; i < numberOfThreads; i++)								// sklejanie wynikowych tablic w przefiltrowany obrazek
             {				
 				byte[] subImage = filteredSubArrays[i];
+				if(subImage == null)
+                {
+					Array.Copy(filteredSubArrays[i], 0, subImage, 0, filteredSubArrays[i].Length);
+
+				}
 				subImageHeightSum += subImage.Length / (width * 3);
 
 				if (i == 0)
